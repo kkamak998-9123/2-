@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Samil Project DB — 재무비율 대시보드</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <p class="brand-eyebrow">Samil Project DB</p>
+      <h1 id="page-title">기업 재무비율 대시보드</h1>
+      <p class="sub" id="page-sub"></p>
+    </div>
+    <div class="tab-bar" id="tab-bar"></div>
+  </header>
+
+  <div class="controls-row">
+    <div class="controls">
+      <input type="text" class="search-box" id="searchBox" placeholder="회사명 검색…" />
+      <div class="year-toggle" id="yearToggle">
+        <button data-year="2023">2023</button>
+        <button data-year="2024">2024</button>
+        <button data-year="2025" class="active">2025</button>
+      </div>
+    </div>
+    <span class="panel-title" id="rowCount"></span>
+  </div>
+
+  <div class="kpis" id="kpiStrip"></div>
+
+  <div class="main-grid">
+    <section class="panel">
+      <div class="panel-head">
+        <span class="panel-title">기업별 비율 · <b id="yearLabel">2025</b>년</span>
+      </div>
+      <div class="table-scroll">
+        <table class="data" id="dataTable">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <span class="panel-title">기업 상세</span>
+      </div>
+      <div class="detail-body" id="detailBody">
+        <div class="empty-hint">왼쪽 표에서 기업을 클릭하면 상세 비율을 볼 수 있습니다.</div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="notes" id="footerNote"></footer>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

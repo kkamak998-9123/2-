@@ -20,13 +20,19 @@ else:  # Mac인 경우 (AppleGothic)
 # 그래프에서 마이너스(-) 기호가 깨지는 현상 방지
 plt.rcParams['axes.unicode_minus'] = False
 
+
+
+
 #1. corp_list 다운받기
 모든회사목록 = dart.get_corp_list()
+
+
+
 
 #2. 리스트에서 회사이름 찾기
 def 회사이름찾기() :
     이름입력 = input(f"회사 명 입력 : ")
-    회사후보 = 모든회사목록.find_by_corp_name(이름입력, exactly=False, market = 'YKNE')
+    회사후보 = 모든회사목록.find_by_corp_name(이름입력, exactly=False, market = 'YK')
     if 회사후보 is None or len(회사후보) == 0:
         print("회사를 찾을 수 없습니다. 다시 입력해 주세요")
         return

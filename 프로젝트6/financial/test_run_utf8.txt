@@ -1,0 +1,87 @@
+Error occurred during getting browser(s): random, but was suppressed with fallback.
+Exception in thread Thread-1 (_spin):
+Traceback (most recent call last):
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1052, in _bootstrap_inner
+    self.run()
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 989, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 570, in _spin
+    self._stream.write(out)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 65, in write
+    self._stream.write(text)
+UnicodeEncodeError: 'cp949' codec can't encode character '\u280b' in position 1: illegal multibyte sequence
+Exception in thread Thread-2 (_spin):
+Traceback (most recent call last):
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1052, in _bootstrap_inner
+    self.run()
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 989, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 570, in _spin
+    self._stream.write(out)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 65, in write
+    self._stream.write(text)
+UnicodeEncodeError: 'cp949' codec can't encode character '\u280b' in position 1: illegal multibyte sequence
+Exception in thread Thread-3 (_spin):
+Traceback (most recent call last):
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1052, in _bootstrap_inner
+    self.run()
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 989, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 570, in _spin
+    self._stream.write(out)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 65, in write
+    self._stream.write(text)
+UnicodeEncodeError: 'cp949' codec can't encode character '\u280b' in position 1: illegal multibyte sequence
+Exception in thread Thread-5 (_spin):
+Traceback (most recent call last):
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1052, in _bootstrap_inner
+    self.run()
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 989, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 570, in _spin
+    self._stream.write(out)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 65, in write
+    self._stream.write(text)
+UnicodeEncodeError: 'cp949' codec can't encode character '\u280b' in position 1: illegal multibyte sequence
+Exception in thread Thread-6 (_spin):
+Traceback (most recent call last):
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1052, in _bootstrap_inner
+    self.run()
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 989, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 570, in _spin
+    self._stream.write(out)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 65, in write
+    self._stream.write(text)
+UnicodeEncodeError: 'cp949' codec can't encode character '\u280b' in position 1: illegal multibyte sequence
+Exception in thread Thread-7 (_spin):
+Traceback (most recent call last):
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1052, in _bootstrap_inner
+    self.run()
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 989, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 570, in _spin
+    self._stream.write(out)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 65, in write
+    self._stream.write(text)
+UnicodeEncodeError: 'cp949' codec can't encode character '\u280b' in position 1: illegal multibyte sequence
+Exception in thread Thread-8 (_spin):
+Traceback (most recent call last):
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1052, in _bootstrap_inner
+    self.run()
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 989, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 570, in _spin
+    self._stream.write(out)
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\yaspin\core.py", line 65, in write
+    self._stream.write(text)
+UnicodeEncodeError: 'cp949' codec can't encode character '\u280b' in position 1: illegal multibyte sequence
+Traceback (most recent call last):
+  File "<string>", line 16, in <module>
+  File "C:\Users\willo\Desktop\�ڵ�\������Ʈ6\financial\03_collect_financials.py", line 134, in collect_company
+    sheet = fs.get(tp)
+            ^^^^^^
+  File "C:\Users\willo\AppData\Local\Programs\Python\Python312\Lib\site-packages\dart_fss\fs\fs.py", line 202, in __getattr__
+    raise AttributeError(error)
+AttributeError: 'FinancialStatement' object has no attribute 'get'
+

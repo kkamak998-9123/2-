@@ -1,0 +1,104 @@
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --ink: #1f2937;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --brand: #0d9488;
+  --brand-dark: #0f766e;
+  --accent: #ecfdf5;
+  --gold: #b45309;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+header {
+  background: linear-gradient(135deg, #0d9488, #0369a1);
+  color: #fff;
+  padding: 28px 20px 22px;
+  text-align: center;
+}
+header h1 { margin: 0 0 8px; font-size: 1.7rem; }
+header .sub { margin: 0; font-size: 0.95rem; opacity: 0.95; }
+
+main { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+form {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+label { display: flex; flex-direction: column; font-size: 0.85rem; font-weight: 600; gap: 4px; }
+input, select {
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+input:focus, select:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+
+fieldset { border: 1px solid var(--line); border-radius: 10px; margin: 12px 0; padding: 12px; }
+legend { font-weight: 700; font-size: 0.9rem; padding: 0 6px; }
+.muted { color: var(--muted); font-weight: 400; }
+
+button#submitBtn {
+  width: 100%; margin-top: 6px; padding: 12px;
+  background: var(--brand); color: #fff; border: none; border-radius: 10px;
+  font-size: 1rem; font-weight: 700; cursor: pointer;
+}
+button#submitBtn:hover { background: var(--brand-dark); }
+button#submitBtn:disabled { opacity: 0.6; cursor: progress; }
+
+.status { text-align: center; margin: 16px 0; color: var(--muted); min-height: 1.2em; }
+
+.results h2 { font-size: 1.2rem; border-bottom: 2px solid var(--brand); padding-bottom: 6px; }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 16px; position: relative;
+}
+.card.best { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(180,83,9,0.2); }
+.badge {
+  position: absolute; top: -10px; right: 12px;
+  background: var(--gold); color: #fff; font-size: 0.72rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 999px;
+}
+.card h3 { margin: 0 0 4px; font-size: 1.05rem; }
+.card .period { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+.card .payout { font-size: 1.5rem; font-weight: 800; color: var(--brand-dark); margin: 6px 0 12px; }
+.card dl { margin: 0; font-size: 0.82rem; display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; }
+.card dt { color: var(--muted); }
+.card dd { margin: 0; text-align: right; font-weight: 600; }
+.card .riders { list-style: none; margin: 10px 0 0; padding: 8px 0 0; border-top: 1px dashed var(--line); font-size: 0.78rem; color: var(--muted); }
+.card .riders li { margin-bottom: 2px; }
+.card .note { margin: 8px 0 0; font-size: 0.72rem; color: var(--gold); }
+
+.disclaimer { margin-top: 30px; font-size: 0.8rem; color: var(--muted); text-align: center; }
+
+@media (max-width: 520px) {
+  header h1 { font-size: 1.35rem; }
+  .cards { grid-template-columns: 1fr; }
+}

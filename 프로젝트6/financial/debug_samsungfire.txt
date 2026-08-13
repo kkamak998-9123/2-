@@ -1,0 +1,5 @@
+bs is None: False
+cis is None: False
+bs columns: [('Statement of financial position(Unit: KWR)', 'label_ko'), ('20251231', ('연결재무제표',)), ('20241231', ('연결재무제표',)), ('20231231', ('연결재무제표',))]
+bs shape: (46, 4)
+cis columns: [('Statement of comprehensive income(Unit: KWR)', 'label_ko'), ('20250101-20251231', ('연결재무제표',)), ('20240101-20241231', ('연결재무제표',)), ('20230101-20231231', ('연결재무제표',))]

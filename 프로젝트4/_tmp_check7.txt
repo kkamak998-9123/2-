@@ -1,0 +1,9 @@
+['stock_code', 'corp_name', 'corp_code', 'bsns_year', 'fs_div', 'sj_div', 'sj_nm', 'account_nm', 'thstrm_amount', 'frmtrm_amount', 'bfefrmtrm_amount', 'ord', 'duplicate_key']
+(1995, 13)
+['부채총계' '자본총계' '유형자산' '재고자산' '총자산' '매출채권' '비유동부채' '영업활동현금흐름' '투자활동현금흐름'
+ '유형자산의 취득' '무형자산의 취득' '재무활동현금흐름' '배당금지급' '당기순이익' '매출액' '영업이익' '매출원가'
+ '판매비와관리비' '금융비용']
+   stock_code corp_name  corp_code  bsns_year fs_div sj_div  sj_nm account_nm  thstrm_amount  frmtrm_amount  bfefrmtrm_amount   ord duplicate_key
+0       68270     DB하이텍     160843       2023    CFS     BS  재무상태표       부채총계   3.032963e+11   5.073817e+11      4.609546e+11  48.0           NaN
+1       68270     DB하이텍     160843       2023    CFS     BS  재무상태표       자본총계   1.740082e+12   1.634784e+12      1.105159e+12  30.0           NaN
+2       68270     DB하이텍     160843       2023    CFS     BS  재무상태표       유형자산   9.509151e+11   7.529468e+11      6.715038e+11  28.0           NaN

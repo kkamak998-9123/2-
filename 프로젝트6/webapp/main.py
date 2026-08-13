@@ -65,7 +65,7 @@ def list_ratios(
     cols = ["corp_code", "stock_code", "corp_name"] + table_keys
     records = df[cols].to_dict("records")
 
-    revenue_vals = df["revenue"].dropna()
+    revenue_vals = df["revenue"].dropna() if "revenue" in df.columns else pd.Series(dtype=float)
     opm_vals = df["opm"].dropna() if "opm" in df.columns else pd.Series(dtype=float)
     profitable = int((df["opinc"] > 0).sum()) if "opinc" in df.columns else None
 
@@ -90,7 +90,12 @@ def get_ratio_detail(industry: str, corp_code: str):
         raise HTTPException(status_code=404, detail="재무비율 데이터가 없습니다")
 
     cfg = INDUSTRY_CONFIG[industry]
-    all_keys = ["revenue"] + [k for k, _, _ in cfg["table_cols"]] + [k for k, _, _ in cfg["detail_cols"]]
+    all_keys = (
+        ["revenue"]
+        + [k for k, _, _ in cfg["table_cols"]]
+        + [k for k, _, _ in cfg["detail_cols"]]
+        + [k for k, _, _ in cfg["sparks"]]
+    )
     all_keys = list(dict.fromkeys(all_keys))  # 순서 유지 중복 제거
 
     years = rows["year"].tolist()

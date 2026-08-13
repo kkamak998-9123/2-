@@ -1,0 +1,4 @@
+     corp_name  bsns_year fs_div    account_nm  thstrm_amount
+6205     두산테스나       2025    OFS  영업권 이외의 무형자산   8.161449e+09
+6365     두산테스나       2024    CFS    무형자산 및 영업권   1.133535e+10
+6542     두산테스나       2023    OFS  영업권 이외의 무형자산   3.762197e+09

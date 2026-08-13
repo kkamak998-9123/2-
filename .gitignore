@@ -2,7 +2,19 @@ __pycache__/
 *.py[cod]
 *$py.class
 .env
-.venv
+.venv/
+.venv-1/
 venv/
 ENV/
+*.log
 NanumGothic.ttf
+
+# 프로젝트5는 이미 자체 GitHub 저장소(kkamak998-9123/project2)로 관리 중 — 모노레포에서는 제외
+프로젝트5/
+
+# 대용량 원본 데이터/캐시 — 코드가 아니라 재생성 가능한 데이터라 저장소 용량 절약 차원에서 제외
+네트워크X 공부/*.csv
+프로젝트2/master_full_fs.csv
+프로젝트2/master_full_fs.db
+**/CORPCODE.xml
+**/corpCode.xml

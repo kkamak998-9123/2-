@@ -1,0 +1,7 @@
+# 배포 저장소 루트(webapp) 기준 .gitignore
+.env
+__pycache__/
+*.pyc
+data/*.db
+data/*.db.tmp
+*.log

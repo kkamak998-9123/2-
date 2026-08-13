@@ -239,8 +239,6 @@ DEFENSE_TABLE_COLS = [
     ("opm", "영업이익률", "pct"),
     ("ocfMargin", "OCF마진", "pct"),
     ("netContractRatio", "순계약자산비율", "pct"),
-    ("arTurn", "매출채권회전율", "x"),
-    ("invTurn", "재고회전율", "x"),
 ]
 DEFENSE_DETAIL_COLS = [
     ("contractAssetRatio", "계약자산비율(미청구)", "pct"),
@@ -251,6 +249,277 @@ DEFENSE_SPARKS = [
     ("opm", "영업이익률", "pct"),
     ("ocfMargin", "OCF마진", "pct"),
     ("netContractRatio", "순계약자산비율", "pct"),
+    ("arTurn", "매출채권회전율", "x"),
+    ("invTurn", "재고회전율", "x"),
+]
+
+
+# ---------------------------------------------------------------------------
+# 금융업(은행/증권/보험/카드캐피탈): 매출액 개념이 없고 업권마다 손익구조가 달라
+# 업종별로 완전히 다른 계정셋을 씀. 계정은 dart-fss 표준 XBRL concept_id 기준으로
+# 정규화된 것(자산총계/부채총계/자본총계/당기순이익/영업이익 등, 업권 공통)과
+# 업권 고유 라벨(예수부채/보험수익/신용판매자산 등, concept_id가 회사마다 커스텀 확장
+# 태그라 라벨명으로만 잡음)이 섞여 있음 - 03_collect_financials.py 참고.
+# BIS비율/K-ICS/NCR/연체율 등 감독규정상 규제비율은 재무제표 자체에 없어 이번 버전엔
+# 미포함(사업보고서 원문 파싱 별도 과제, PART V 한계 참고).
+# ---------------------------------------------------------------------------
+
+def compute_bank(acc: dict) -> dict:
+    interest_income = acc.get("이자수익")
+    interest_expense = acc.get("이자비용")
+    nii = acc.get("순이자손익")
+    fee_income = acc.get("수수료수익")
+    fee_expense = acc.get("수수료비용")
+    net_fee = acc.get("순수수료손익")
+    opinc = acc.get("영업이익")
+    ni = acc.get("당기순이익")
+    assets = acc.get("자산총계")
+    liab = acc.get("부채총계")
+    equity = acc.get("자본총계")
+    loans = acc.get("대출채권") or acc.get("상각후원가대출채권")
+    deposits = acc.get("예수부채")
+    cash_due = acc.get("현금및예치금")
+    impairment = acc.get("금융자산손상차손")
+    borrowings = acc.get("차입부채")
+    bonds = acc.get("사채")
+
+    impairment_expense = abs(impairment) if impairment is not None else None
+    funding = None
+    if borrowings is not None or bonds is not None:
+        funding = (borrowings or 0) + (bonds or 0)
+
+    return {
+        "nii": nii,
+        "interestIncome": interest_income,
+        "interestExpense": interest_expense,
+        "netFee": net_fee,
+        "feeIncome": fee_income,
+        "feeExpense": fee_expense,
+        "opinc": opinc,
+        "ni": ni,
+        "roe": _pct(ni, equity),
+        "roa": _pct(ni, assets),
+        "debtRatio": _pct(liab, equity),
+        "equityRatio": _pct(equity, assets),
+        "loanDepositRatio": _pct(loans, deposits),
+        "impairmentToLoans": _pct(impairment_expense, loans),
+        "fundingDependency": _pct(funding, assets),
+        "assets": assets,
+        "equity": equity,
+        "loans": loans,
+        "deposits": deposits,
+        "cashDue": cash_due,
+    }
+
+
+BANK_TABLE_COLS = [
+    ("nii", "순이자손익", "won"),
+    ("roe", "ROE", "pct"),
+    ("roa", "ROA", "pct"),
+    ("loanDepositRatio", "예대율(근사)", "pct"),
+    ("impairmentToLoans", "대손비용률(근사)", "pct"),
+    ("equityRatio", "자기자본비율", "pct"),
+]
+BANK_DETAIL_COLS = [
+    ("interestIncome", "이자수익", "won"),
+    ("interestExpense", "이자비용", "won"),
+    ("netFee", "순수수료손익", "won"),
+    ("opinc", "영업이익", "won"),
+    ("ni", "당기순이익", "won"),
+    ("debtRatio", "부채비율", "pct"),
+    ("fundingDependency", "차입금·사채의존도", "pct"),
+    ("assets", "자산총계", "won"),
+    ("loans", "대출채권", "won"),
+    ("deposits", "예수부채", "won"),
+]
+BANK_SPARKS = [
+    ("nii", "순이자손익", "won"),
+    ("roe", "ROE", "pct"),
+    ("loanDepositRatio", "예대율(근사)", "pct"),
+    ("impairmentToLoans", "대손비용률(근사)", "pct"),
+]
+
+
+def compute_securities(acc: dict) -> dict:
+    fee_income = acc.get("수수료수익")
+    fee_expense = acc.get("수수료비용")
+    net_fee = acc.get("순수수료손익")
+    interest_income = acc.get("이자수익")
+    interest_expense = acc.get("이자비용")
+    net_interest = acc.get("순이자손익")
+    net_operating = acc.get("순영업손익")
+    opinc = acc.get("영업이익")
+    ni = acc.get("당기순이익")
+    assets = acc.get("자산총계")
+    liab = acc.get("부채총계")
+    equity = acc.get("자본총계")
+    deposits = acc.get("예수부채")
+    borrowings = acc.get("차입부채")
+    bonds = acc.get("발행사채")
+
+    funding = None
+    if borrowings is not None or bonds is not None:
+        funding = (borrowings or 0) + (bonds or 0)
+
+    return {
+        "netOperatingIncome": net_operating,
+        "feeIncomeRatio": _pct(net_fee, net_operating),
+        "netInterestRatio": _pct(net_interest, net_operating),
+        "opinc": opinc,
+        "ni": ni,
+        "roe": _pct(ni, equity),
+        "roa": _pct(ni, assets),
+        "debtRatio": _pct(liab, equity),
+        "equityRatio": _pct(equity, assets),
+        "customerDepositRatio": _pct(deposits, assets),
+        "fundingDependency": _pct(funding, assets),
+        "netFee": net_fee,
+        "assets": assets,
+        "equity": equity,
+    }
+
+
+SECURITIES_TABLE_COLS = [
+    ("netOperatingIncome", "순영업손익(매출액 대용)", "won"),
+    ("roe", "ROE", "pct"),
+    ("feeIncomeRatio", "수수료손익비중", "pct"),
+    ("netInterestRatio", "순이자손익비중", "pct"),
+    ("equityRatio", "자기자본비율", "pct"),
+]
+SECURITIES_DETAIL_COLS = [
+    ("netFee", "순수수료손익", "won"),
+    ("opinc", "영업이익", "won"),
+    ("ni", "당기순이익", "won"),
+    ("roa", "ROA", "pct"),
+    ("debtRatio", "부채비율", "pct"),
+    ("customerDepositRatio", "투자자예수금비율", "pct"),
+    ("fundingDependency", "차입금·사채의존도", "pct"),
+    ("assets", "자산총계", "won"),
+]
+SECURITIES_SPARKS = [
+    ("netOperatingIncome", "순영업손익", "won"),
+    ("roe", "ROE", "pct"),
+    ("feeIncomeRatio", "수수료손익비중", "pct"),
+]
+
+
+def compute_insurance(acc: dict) -> dict:
+    insurance_revenue = acc.get("보험수익")
+    insurance_service_expense = acc.get("보험서비스비용")
+    insurance_pl = acc.get("보험손익")
+    investment_pl = acc.get("투자손익")
+    opinc = acc.get("영업이익")
+    ni = acc.get("당기순이익")
+    assets = acc.get("자산총계")
+    liab = acc.get("부채총계")
+    equity = acc.get("자본총계")
+    insurance_liab = acc.get("보험계약부채")
+
+    if insurance_pl is None and insurance_revenue is not None and insurance_service_expense is not None:
+        insurance_pl = insurance_revenue - insurance_service_expense
+
+    return {
+        "insurancePL": insurance_pl,
+        "insuranceRevenue": insurance_revenue,
+        "insuranceServiceExpense": insurance_service_expense,
+        "investmentPL": investment_pl,
+        "opinc": opinc,
+        "ni": ni,
+        "roe": _pct(ni, equity),
+        "roa": _pct(ni, assets),
+        "debtRatio": _pct(liab, equity),
+        "equityRatio": _pct(equity, assets),
+        "insuranceLiabRatio": _pct(insurance_liab, assets),
+        "investmentPLShare": _pct(investment_pl, opinc),
+        "assets": assets,
+        "equity": equity,
+    }
+
+
+INSURANCE_TABLE_COLS = [
+    ("insurancePL", "보험손익", "won"),
+    ("investmentPL", "투자손익", "won"),
+    ("roe", "ROE", "pct"),
+    ("insuranceLiabRatio", "보험계약부채비율", "pct"),
+    ("equityRatio", "자기자본비율", "pct"),
+]
+INSURANCE_DETAIL_COLS = [
+    ("insuranceRevenue", "보험수익", "won"),
+    ("insuranceServiceExpense", "보험서비스비용", "won"),
+    ("investmentPLShare", "투자손익/영업이익", "pct"),
+    ("opinc", "영업이익", "won"),
+    ("ni", "당기순이익", "won"),
+    ("roa", "ROA", "pct"),
+    ("debtRatio", "부채비율", "pct"),
+    ("assets", "자산총계", "won"),
+]
+INSURANCE_SPARKS = [
+    ("insurancePL", "보험손익", "won"),
+    ("investmentPL", "투자손익", "won"),
+    ("roe", "ROE", "pct"),
+]
+
+
+def compute_cardcapital(acc: dict) -> dict:
+    revenue = acc.get("영업수익")
+    credit_sales_revenue = acc.get("신용판매수익")
+    bad_debt = acc.get("대손상각비")
+    opinc = acc.get("영업이익")
+    ni = acc.get("당기순이익")
+    assets = acc.get("자산총계")
+    liab = acc.get("부채총계")
+    equity = acc.get("자본총계")
+    credit_sales_asset = acc.get("신용판매자산")
+    installment_asset = acc.get("할부금융자산")
+    borrowings = acc.get("차입금")
+    bonds = acc.get("사채")
+
+    funding = None
+    if borrowings is not None or bonds is not None:
+        funding = (borrowings or 0) + (bonds or 0)
+
+    return {
+        "revenue": revenue,
+        "creditSalesRevenue": credit_sales_revenue,
+        "opinc": opinc,
+        "ni": ni,
+        "opm": _pct(opinc, revenue),
+        "roa": _pct(ni, assets),
+        "roe": _pct(ni, equity),
+        "leverageRatio": _safe_div(assets, equity),
+        "debtRatio": _pct(liab, equity),
+        "fundingDependency": _pct(funding, assets),
+        "badDebtToRevenue": _pct(bad_debt, revenue),
+        "creditSalesAssetRatio": _pct(credit_sales_asset, assets),
+        "installmentAssetRatio": _pct(installment_asset, assets),
+        "assets": assets,
+        "equity": equity,
+    }
+
+
+CARDCAPITAL_TABLE_COLS = [
+    ("revenue", "영업수익(매출액 대용)", "won"),
+    ("opm", "영업이익률", "pct"),
+    ("roa", "ROA", "pct"),
+    ("leverageRatio", "레버리지배율", "x"),
+    ("badDebtToRevenue", "대손상각비/영업수익", "pct"),
+]
+CARDCAPITAL_DETAIL_COLS = [
+    ("creditSalesRevenue", "신용판매수익", "won"),
+    ("opinc", "영업이익", "won"),
+    ("ni", "당기순이익", "won"),
+    ("roe", "ROE", "pct"),
+    ("debtRatio", "부채비율", "pct"),
+    ("fundingDependency", "차입금·사채의존도", "pct"),
+    ("creditSalesAssetRatio", "신용판매자산비율", "pct"),
+    ("installmentAssetRatio", "할부금융자산비율", "pct"),
+    ("assets", "자산총계", "won"),
+]
+CARDCAPITAL_SPARKS = [
+    ("revenue", "영업수익", "won"),
+    ("opm", "영업이익률", "pct"),
+    ("leverageRatio", "레버리지배율", "x"),
+    ("badDebtToRevenue", "대손상각비/영업수익", "pct"),
 ]
 
 
@@ -281,5 +550,44 @@ INDUSTRY_CONFIG = {
         "sparks": DEFENSE_SPARKS,
         "note": "현재 확보된 계정과목이 7개뿐이라 당기순이익·ROE 등은 계산할 수 없습니다. "
                 "순계약자산비율(계약자산-계약부채)로 수주 회수 리스크를 대신 보여줍니다. (임시 구성 - 추후 보강 예정)",
+    },
+    "bank": {
+        "label": "은행/지주",
+        "compute": compute_bank,
+        "table_cols": BANK_TABLE_COLS,
+        "detail_cols": BANK_DETAIL_COLS,
+        "sparks": BANK_SPARKS,
+        "note": "매출액 개념이 없어 순이자손익을 핵심 지표로 사용합니다. 예대율·대손비용률은 "
+                "원화 기준이 아닌 연결 전체 기준 근사치입니다. BIS비율·NIM·고정이하여신비율 등 "
+                "감독규정상 규제비율은 재무제표에 없어 사업보고서 원문 파싱 없이는 산출 불가(추후 보강 과제).",
+    },
+    "securities": {
+        "label": "증권",
+        "compute": compute_securities,
+        "table_cols": SECURITIES_TABLE_COLS,
+        "detail_cols": SECURITIES_DETAIL_COLS,
+        "sparks": SECURITIES_SPARKS,
+        "note": "순영업손익(수수료+이자+트레이딩손익 합계)을 매출액 대용 지표로 사용합니다. "
+                "영업용순자본비율(신NCR) 등 자본적정성 규제비율은 사업보고서 원문 파싱 필요(추후 보강 과제).",
+    },
+    "insurance": {
+        "label": "보험",
+        "compute": compute_insurance,
+        "table_cols": INSURANCE_TABLE_COLS,
+        "detail_cols": INSURANCE_DETAIL_COLS,
+        "sparks": INSURANCE_SPARKS,
+        "note": "2023년 IFRS17 전면 도입 이후 기준(보험수익/보험손익)만 산출합니다. 2022년 이전 "
+                "수치와는 개념이 달라 단순 비교하면 안 됩니다. 지급여력비율(K-ICS)·손해율·사업비율은 "
+                "사업보고서 원문 파싱 필요(추후 보강 과제).",
+    },
+    "cardcapital": {
+        "label": "카드/캐피탈",
+        "compute": compute_cardcapital,
+        "table_cols": CARDCAPITAL_TABLE_COLS,
+        "detail_cols": CARDCAPITAL_DETAIL_COLS,
+        "sparks": CARDCAPITAL_SPARKS,
+        "note": "영업수익을 매출액 대용 지표로 사용합니다. 예수금이 없어 차입금·사채의존도가 "
+                "은행과 다른 의미(전액 시장성 조달)를 가집니다. 연체율·대손충당금적립률·"
+                "조정자기자본비율은 사업보고서 원문 파싱 필요(추후 보강 과제).",
     },
 }

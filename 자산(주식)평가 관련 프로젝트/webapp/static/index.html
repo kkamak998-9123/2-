@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>비상장주식 평가 계산기</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <p class="brand-eyebrow">상증세법 시행령 §54~56 · 보충적 평가방법</p>
+      <h1>비상장주식 평가 계산기</h1>
+      <p class="sub">순손익가치·순자산가치 가중평균, 최대주주 할증, 특수법인 판단까지 한 번에 계산합니다.</p>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <div class="col-left">
+
+      <!-- 재무자료 불러오기 -->
+      <section class="panel">
+        <div class="panel-head">
+          <span class="panel-title">재무자료 불러오기</span>
+          <span class="hint">고정 서식 CSV 3종을 올리면 아래 항목들이 자동으로 채워집니다</span>
+        </div>
+        <div class="panel-body upload-grid">
+          <label class="field">
+            <span>재무상태표.csv (자산총계/부채총계)</span>
+            <input type="file" id="fileBalanceSheet" accept=".csv" />
+          </label>
+          <label class="field">
+            <span>손익계산서_3개년.csv</span>
+            <input type="file" id="fileIncomeStatements" accept=".csv" />
+          </label>
+          <label class="field">
+            <span>소득금액조정합계표_3개년.csv</span>
+            <input type="file" id="fileAdjustments" accept=".csv" />
+          </label>
+          <button class="upload-btn" id="uploadBtn" type="button">재무자료 불러오기</button>
+          <div id="uploadStatus" class="upload-status"></div>
+        </div>
+      </section>
+
+      <!-- 기본 정보 -->
+      <section class="panel">
+        <div class="panel-head"><span class="panel-title">기본 정보</span></div>
+        <div class="panel-body form-grid">
+          <label class="field">
+            <span>발행주식총수 (주)</span>
+            <input type="number" id="sharesOutstanding" min="1" step="1" value="10000" />
+          </label>
+          <label class="field">
+            <span>순손익가치환원율 (%)</span>
+            <input type="number" id="capitalizationRate" min="0.01" step="0.1" value="10" />
+          </label>
+          <label class="field">
+            <span>법인 유형</span>
+            <select id="specialCorpType"></select>
+          </label>
+        </div>
+      </section>
+
+      <!-- 순손익가치 -->
+      <section class="panel">
+        <div class="panel-head">
+          <span class="panel-title">순손익가치 &middot; 최근 3개 사업연도 순손익액</span>
+          <span class="hint">항목을 만들어 드래그로 A·B·C 영역에 분류하세요</span>
+        </div>
+        <div class="panel-body">
+          <div class="year-toggle" id="yearTabs"></div>
+          <div id="yearPanels"></div>
+        </div>
+      </section>
+
+      <!-- 순자산가치 -->
+      <section class="panel">
+        <div class="panel-head"><span class="panel-title">순자산가치</span></div>
+        <div class="panel-body form-grid">
+          <label class="field">
+            <span>자산총액 (원)</span>
+            <input type="number" id="totalAssets" step="1" value="0" />
+          </label>
+          <label class="field">
+            <span>부채총액 (원)</span>
+            <input type="number" id="totalLiabilities" step="1" value="0" />
+          </label>
+          <label class="field">
+            <span>영업권 등 가산액 (원)</span>
+            <input type="number" id="goodwill" step="1" value="0" />
+          </label>
+        </div>
+      </section>
+
+      <!-- 최대주주 할증 -->
+      <section class="panel">
+        <div class="panel-head"><span class="panel-title">최대주주 등 할증평가</span></div>
+        <div class="panel-body form-grid">
+          <label class="check-field">
+            <input type="checkbox" id="isMajorShareholder" />
+            <span>최대주주 등 보유주식에 해당</span>
+          </label>
+          <label class="check-field">
+            <input type="checkbox" id="isExempt" />
+            <span>중소기업 등 할증 면제 대상</span>
+          </label>
+          <label class="field">
+            <span>할증률 (%)</span>
+            <input type="number" id="premiumRate" min="0" step="1" value="20" />
+          </label>
+        </div>
+      </section>
+
+      <button class="calc-btn" id="calcBtn">평가액 계산하기</button>
+    </div>
+
+    <div class="col-right">
+      <section class="panel result-panel">
+        <div class="panel-head"><span class="panel-title">계산 결과</span></div>
+        <div class="panel-body" id="resultBody">
+          <div class="empty-hint">좌측 항목을 입력하고 "평가액 계산하기"를 눌러주세요.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer class="notes">
+    <b>안내</b> · 본 계산기는 상속세및증여세법 시행령 제54조~제56조에 따른 비상장주식 보충적 평가방법을 간이화한 도구입니다.
+    실제 신고 시에는 세무조정 명세서, 감정평가 등 개별 사안에 따른 정확한 검토가 필요합니다.
+  </footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+bank: 790행, 14개사 -> C:\Users\willo\Desktop\코딩\프로젝트6\webapp\data\bank.csv
+securities: 849행, 20개사 -> C:\Users\willo\Desktop\코딩\프로젝트6\webapp\data\securities.csv
+insurance: 551행, 12개사 -> C:\Users\willo\Desktop\코딩\프로젝트6\webapp\data\insurance.csv
+cardcapital: 183행, 4개사 -> C:\Users\willo\Desktop\코딩\프로젝트6\webapp\data\cardcapital.csv

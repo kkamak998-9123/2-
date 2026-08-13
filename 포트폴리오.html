@@ -1,0 +1,476 @@
+<title>프로젝트 등록부</title>
+<style>
+  /* ---------------------------------------------------------------
+     토큰: 라이트(기본) → prefers-color-scheme(다크) → data-theme(토글, 최종 우선)
+     팔레트: 회계 장부(장부 용지의 옅은 세이지그린)를 모티프로, 순 회색 대신
+     초록 기미를 준 뉴트럴을 채택. 포인트는 소나무그린(완료/게시) + 황동색
+     (도장 잉크, 대기) + 슬레이트블루(자료/서류) 세 갈래의 의미색.
+  ----------------------------------------------------------------*/
+  :root {
+    --bg: #e7ece3;
+    --bg-rule: #d7ddcf;
+    --surface: #fbfbf6;
+    --surface-2: #f2f3ec;
+    --ink: #1e2a20;
+    --ink-muted: #5a6a5c;
+    --ink-faint: #8b988a;
+    --border: rgba(30, 42, 32, 0.14);
+    --border-soft: rgba(30, 42, 32, 0.08);
+    --accent: #2c6a49;       /* 소나무그린 — 게시/완료 */
+    --accent-ink: #1f4d36;
+    --pending: #a5711f;      /* 황동 — 배포 준비 */
+    --pending-ink: #7c5416;
+    --data: #47606c;         /* 슬레이트블루 — 자료·리포트 */
+    --data-ink: #33474f;
+    --shadow: 0 1px 2px rgba(20, 30, 22, 0.06), 0 6px 20px -12px rgba(20, 30, 22, 0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10140f;
+      --bg-rule: #1b2118;
+      --surface: #171d15;
+      --surface-2: #1e251a;
+      --ink: #e6ebe1;
+      --ink-muted: #9aab97;
+      --ink-faint: #66756487;
+      --border: rgba(230, 235, 225, 0.14);
+      --border-soft: rgba(230, 235, 225, 0.08);
+      --accent: #6fc093;
+      --accent-ink: #bfe8d2;
+      --pending: #e0ac5e;
+      --pending-ink: #f4d7a4;
+      --data: #9fb7c2;
+      --data-ink: #cfe0e7;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -14px rgba(0, 0, 0, 0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10140f;
+    --bg-rule: #1b2118;
+    --surface: #171d15;
+    --surface-2: #1e251a;
+    --ink: #e6ebe1;
+    --ink-muted: #9aab97;
+    --ink-faint: #66756487;
+    --border: rgba(230, 235, 225, 0.14);
+    --border-soft: rgba(230, 235, 225, 0.08);
+    --accent: #6fc093;
+    --accent-ink: #bfe8d2;
+    --pending: #e0ac5e;
+    --pending-ink: #f4d7a4;
+    --data: #9fb7c2;
+    --data-ink: #cfe0e7;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -14px rgba(0, 0, 0, 0.6);
+  }
+  :root[data-theme="light"] {
+    --bg: #e7ece3;
+    --bg-rule: #d7ddcf;
+    --surface: #fbfbf6;
+    --surface-2: #f2f3ec;
+    --ink: #1e2a20;
+    --ink-muted: #5a6a5c;
+    --ink-faint: #8b988a;
+    --border: rgba(30, 42, 32, 0.14);
+    --border-soft: rgba(30, 42, 32, 0.08);
+    --accent: #2c6a49;
+    --accent-ink: #1f4d36;
+    --pending: #a5711f;
+    --pending-ink: #7c5416;
+    --data: #47606c;
+    --data-ink: #33474f;
+    --shadow: 0 1px 2px rgba(20, 30, 22, 0.06), 0 6px 20px -12px rgba(20, 30, 22, 0.18);
+  }
+
+  /* ---------------- 타이포그래피 ----------------
+     제목: 바탕(Batang) — 공문서·법령·정관에 쓰이는 한글 명조로, 조세특례제한법
+     조문 매칭부터 재무제표까지 다루는 이 등록부의 성격과 맞닿아 있음.
+     본문: 시스템 고딕(가독성). 라벨/수치/기술스택: 모노스페이스(장부의 숫자 정렬).
+  ------------------------------------------------*/
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      repeating-linear-gradient(
+        var(--bg),
+        var(--bg) 34px,
+        var(--bg-rule) 34px,
+        var(--bg-rule) 35px
+      );
+    color: var(--ink);
+    font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .serif {
+    font-family: Batang, "바탕", "New Batang", "Noto Serif KR", serif;
+  }
+  .mono {
+    font-family: "D2Coding", "Consolas", "SFMono-Regular", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  a { color: var(--accent); text-decoration-color: var(--border); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: currentColor; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  /* ---------------- 헤더: 등록부 표지 ---------------- */
+  header.cover {
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-size: clamp(1.7rem, 1.15rem + 2vw, 2.5rem);
+    font-weight: 700;
+    margin: 0 0 14px;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .intro {
+    max-width: 62ch;
+    color: var(--ink-muted);
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  /* ---------------- 집계 줄(장부 합계처럼) ---------------- */
+  .tally {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 0;
+    margin: 26px 0 0;
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .tally dl {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0;
+    padding: 0 22px;
+    border-right: 1px solid var(--border-soft);
+  }
+  .tally dl:last-child { border-right: none; }
+  .tally dt {
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+  }
+  .tally dd {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  .tally dd.n-live { color: var(--accent-ink); }
+  .tally dd.n-pending { color: var(--pending-ink); }
+
+  /* ---------------- 카드 그리드 ---------------- */
+  .register {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 18px;
+  }
+
+  .entry {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 20px 18px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .entry:hover { transform: translateY(-2px); }
+  }
+  .entry:hover { box-shadow: 0 2px 4px rgba(20,30,22,0.08), 0 14px 28px -14px rgba(20,30,22,0.28); }
+
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .entry-no {
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+    margin: 0 0 2px;
+  }
+  .entry h2 {
+    font-size: 1.14rem;
+    font-weight: 700;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  /* 도장(스탬프) 배지 — 좌측 색상 레일 대신, 실제 문서에 찍는 도장을 본뜬 라벨 */
+  .stamp {
+    flex: none;
+    font-family: "D2Coding", "Consolas", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+  }
+  .stamp.live { color: var(--accent-ink); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .stamp.pending { color: var(--pending-ink); background: color-mix(in srgb, var(--pending) 14%, transparent); }
+  .stamp.local { color: var(--ink-muted); background: var(--surface-2); border-color: var(--border); }
+  .stamp.data { color: var(--data-ink); background: color-mix(in srgb, var(--data) 14%, transparent); }
+
+  .pitch {
+    font-size: 0.92rem;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .entry-foot {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .stack {
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+  }
+  .stack span { white-space: nowrap; }
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.74rem;
+    color: var(--ink-faint);
+  }
+  .visit {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent-ink);
+  }
+
+  footer.notes {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  @media (max-width: 520px) {
+    .page { padding: 40px 16px 60px; }
+    .tally dl { padding: 0 14px; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="cover">
+    <p class="eyebrow mono">PERSONAL PROJECT REGISTER · 회계·감사 실무자의 사이드 프로젝트</p>
+    <h1 class="serif">직접 만든 여덟 개의 도구</h1>
+    <p class="intro">
+      세무·회계 실무에서 쓰던 판단 기준을 코드로 옮긴 기록입니다. 조세특례제한법 조문 매칭부터
+      복지 혜택 검색, 재무제표 분석, 비상장주식 평가, 실손보험 청구액 계산까지 —
+      전부 SPEC부터 함께 정리하고 실제 API·데이터로 검증한 뒤에 완성한 것들입니다.
+    </p>
+
+    <dl class="tally mono">
+      <dl><dt>총</dt><dd>8건</dd></dl>
+      <dl><dt>배포됨</dt><dd class="n-live">1</dd></dl>
+      <dl><dt>배포 준비</dt><dd class="n-pending">2</dd></dl>
+      <dl><dt>로컬 완성</dt><dd>2</dd></dl>
+      <dl><dt>데이터·리포트</dt><dd>3</dd></dl>
+    </dl>
+  </header>
+
+  <div class="register">
+
+    <article class="entry">
+      <div class="entry-head">
+        <div>
+          <p class="entry-no mono">No. 1 · 2026-08-01</p>
+          <h2 class="serif">조특법 프로젝트</h2>
+        </div>
+        <span class="stamp local">로컬 완성</span>
+      </div>
+      <p class="pitch">
+        나이·소득·법인 정보를 입력하면 조세특례제한법상 적용 가능성이 있는 특례 조항을
+        찾아준다. 개인 소득세 18개 + 법인세 16개 조항, 국가법령정보센터 원문을 실시간 조회.
+      </p>
+      <div class="entry-foot">
+        <p class="stack mono">Python · law.go.kr API · SQLite 캐시</p>
+        <p class="meta-row"><span>CLI 도구</span><span>1차 스크리닝용, 전문가 확인 병기</span></p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <div>
+          <p class="entry-no mono">No. 2 · 2026-08-12</p>
+          <h2 class="serif">복지혜택 매칭 프로젝트</h2>
+        </div>
+        <span class="stamp pending">배포 준비</span>
+      </div>
+      <p class="pitch">
+        나이·지역·관심주제·가구상황으로 중앙부처·지자체 복지 혜택 4,747건 전체를
+        SQLite에 적재해두고 즉시 검색. 상세는 클릭 시 공공데이터포털 API로 실시간 조회.
+      </p>
+      <div class="entry-foot">
+        <p class="stack mono">FastAPI · SQLite · 공공데이터포털 API</p>
+        <p class="meta-row"><span>웹앱</span><span>Render 저장소 준비 완료 · 미배포</span></p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <div>
+          <p class="entry-no mono">No. 3 · 2026-08-09</p>
+          <h2 class="serif">DART 업종별 재무비율 분석</h2>
+        </div>
+        <span class="stamp live">배포됨</span>
+      </div>
+      <p class="pitch">
+        회사명을 검색하면 DART 재무제표(손익·재무상태·현금흐름)와 업종에 맞는 추천 재무비율을
+        함께 보여준다. 상장·비상장 11.8만개사 전체 검색 지원.
+      </p>
+      <div class="entry-foot">
+        <p class="stack mono">FastAPI · DART OpenAPI · dart-fss</p>
+        <p class="meta-row">
+          <span>웹앱</span>
+          <a class="visit" href="https://dart-industry-ratio-analyzer.onrender.com" target="_blank" rel="noopener">방문하기 ↗</a>
+        </p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <div>
+          <p class="entry-no mono">No. 4 · 2026-08-12</p>
+          <h2 class="serif">보험금 계산 프로젝트</h2>
+        </div>
+        <span class="stamp pending">배포 준비</span>
+      </div>
+      <p class="pitch">
+        영수증에 찍힌 급여·비급여 금액을 입력하면 실손의료보험 1~4세대(2세대는 2-1/2-2 분리)
+        표준 규칙으로 예상 수령액을 나란히 비교한다.
+      </p>
+      <div class="entry-foot">
+        <p class="stack mono">FastAPI · 순수 계산엔진 · unittest 16개</p>
+        <p class="meta-row"><span>웹앱</span><span>Render 저장소 준비 완료 · 미배포</span></p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <div>
+          <p class="entry-no mono">No. 5 · 2026-08-02</p>
+          <h2 class="serif">자산(주식)평가 프로젝트</h2>
+        </div>
+        <span class="stamp local">로컬 완성</span>
+      </div>
+      <p class="pitch">
+        재무상태표·손익계산서·소득금액조정합계표 CSV를 업로드하면 상증세법 시행령상
+        비상장주식 보충적 평가방법(순손익가치·순자산가치 가중평균)으로 가치를 계산한다.
+      </p>
+      <div class="entry-foot">
+        <p class="stack mono">FastAPI · pandas · Vanilla JS</p>
+        <p class="meta-row"><span>웹앱</span><span>로컬 실행 · 미배포</span></p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <div>
+          <p class="entry-no mono">No. 6 · 2026-08-02</p>
+          <h2 class="serif">빅4회계법인 매출분석</h2>
+        </div>
+        <span class="stamp data">데이터·리포트</span>
+      </div>
+      <p class="pitch">
+        삼일·삼정·안진·한영 4개 회계법인이 DART에 제출한 회계법인사업보고서 원문에서
+        감사·세무자문·경영자문 매출 구성을 직접 추출해 3개년 비교표로 정리했다.
+      </p>
+      <div class="entry-foot">
+        <p class="stack mono">DART OpenAPI · Excel</p>
+        <p class="meta-row"><span>정적 리포트</span><span>한영만 감사 비중 50%↑·3년 연속 상승</span></p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <div>
+          <p class="entry-no mono">No. 7 · 2026-08-07</p>
+          <h2 class="serif">횡령배임공시 분석 프로젝트</h2>
+        </div>
+        <span class="stamp data">데이터·리포트</span>
+      </div>
+      <p class="pitch">
+        KIND(한국거래소 상장공시시스템)의 횡령·배임 투자유의사항 공시를 크롤링해 사고 금액·
+        자기자본 대비 비율·발생일 등을 추출하고 회사별로 시계열 정리했다.
+      </p>
+      <div class="entry-foot">
+        <p class="stack mono">Python · requests · KIND 크롤러</p>
+        <p class="meta-row"><span>데이터 수집</span><span>원시 공시 데이터셋 확보</span></p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <div>
+          <p class="entry-no mono">No. 8 · 2026-07-16</p>
+          <h2 class="serif">4대회계법인 감사현황 수집</h2>
+        </div>
+        <span class="stamp data">데이터·리포트</span>
+      </div>
+      <p class="pitch">
+        전체 상장기업의 감사인 정보를 DART에서 조회해 삼일·삼정·한영·안진 4대회계법인이
+        각각 몇 개 기업을 감사하는지 법인별 시트로 정리했다.
+      </p>
+      <div class="entry-foot">
+        <p class="stack mono">DART OpenAPI · Excel</p>
+        <p class="meta-row"><span>정적 리포트</span><span>상장사 전수 조사</span></p>
+      </div>
+    </article>
+
+  </div>
+
+  <footer class="notes mono">
+    <span>업데이트 2026-08-13 · C:\Users\willo\Desktop\코딩</span>
+    <span>각 프로젝트의 상세 설계는 폴더별 SPEC.md에 기록</span>
+  </footer>
+
+</div>

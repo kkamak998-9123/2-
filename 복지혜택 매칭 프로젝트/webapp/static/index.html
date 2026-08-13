@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>복지혜택 매칭</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <h1>복지혜택 매칭</h1>
+    <p class="sub">나이·지역·관심사를 입력하면 받을 수 있는 복지 혜택을 찾아드립니다.<br />
+      <span class="muted">중앙부처(전국공통) + 지자체 복지서비스 · 출처: 공공데이터포털(한국사회보장정보원)</span>
+    </p>
+    <p class="notice" id="coldStart">
+      ⏳ 서버가 처음 깨어나면(무료 플랜) 복지 데이터 적재에 1~2분 걸릴 수 있습니다. 첫 조회가 느려도 잠시 기다려 주세요.
+    </p>
+  </header>
+
+  <main>
+    <form id="searchForm">
+      <div class="row">
+        <label>나이
+          <input type="number" id="age" min="0" max="130" placeholder="예: 30" />
+        </label>
+        <label>시/도
+          <select id="ctpv"><option value="">(선택 안 함 · 전국공통만)</option></select>
+        </label>
+        <label>시/군/구
+          <select id="sgg"><option value="">(전체)</option></select>
+        </label>
+        <label>키워드
+          <input type="text" id="keyword" placeholder="예: 주거, 청년, 의료" />
+        </label>
+      </div>
+
+      <fieldset>
+        <legend>관심주제 <span class="muted">(복수 선택)</span></legend>
+        <div class="chips" id="themes"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>해당 가구상황 <span class="muted">(복수 선택)</span></legend>
+        <div class="chips" id="households"></div>
+      </fieldset>
+
+      <button type="submit" id="submitBtn">복지 혜택 찾기</button>
+    </form>
+
+    <section id="status" class="status"></section>
+
+    <section id="results" class="results" hidden>
+      <div class="group">
+        <h2>전국 공통 <span class="count" id="nCount"></span></h2>
+        <div id="nationalList" class="cards"></div>
+      </div>
+      <div class="group" id="localGroup" hidden>
+        <h2 id="localTitle">지역</h2>
+        <span class="count" id="lCount"></span>
+        <div id="localList" class="cards"></div>
+      </div>
+    </section>
+
+    <p class="disclaimer">
+      ※ 이 결과는 법적 효력이 있는 복지 상담이 아닙니다. 최종 신청 가능 여부는 관할 주민센터 또는
+      <a href="https://www.bokjiro.go.kr" target="_blank" rel="noopener">복지로</a>에서 반드시 확인하세요.
+    </p>
+  </main>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose" aria-label="닫기">×</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+﻿corp_code,stock_code,corp_name,market,krx_sector,industry_id,classification_note
+00858364,138930,BNK금융지주,stockMkt,기타 금융업,bank,"금융지주(은행 그룹으로 분류, PART V 한계 참고)"
+00980122,175330,JB금융지주,stockMkt,기타 금융업,bank,"금융지주(은행 그룹으로 분류, PART V 한계 참고)"
+00688996,105560,KB금융,stockMkt,기타 금융업,bank,"금융지주(은행 그룹으로 분류, PART V 한계 참고)"
+00878915,139130,iM금융지주,stockMkt,기타 금융업,bank,"금융지주(은행 그룹으로 분류, PART V 한계 참고)"
+00149646,024110,기업은행,stockMkt,은행 및 저축기관,bank,은행/저축은행
+00860332,138040,메리츠금융지주,stockMkt,기타 금융업,bank,"금융지주(은행 그룹으로 분류, PART V 한계 참고)"
+00382199,055550,신한지주,stockMkt,기타 금융업,bank,"금융지주(은행 그룹으로 분류, PART V 한계 참고)"
+01350869,316140,우리금융지주,stockMkt,기타 금융업,bank,"금융지주(은행 그룹으로 분류, PART V 한계 참고)"
+00148832,006220,제주은행,stockMkt,은행 및 저축기관,bank,은행/저축은행
+01133217,323410,카카오뱅크,stockMkt,은행 및 저축기관,bank,은행/저축은행
+01203312,279570,케이뱅크,stockMkt,은행 및 저축기관,bank,은행/저축은행
+00124805,007330,푸른저축은행,kosdaqMkt,은행 및 저축기관,bank,은행/저축은행
+00547583,086790,하나금융지주,stockMkt,기타 금융업,bank,"금융지주(은행 그룹으로 분류, PART V 한계 참고)"
+00432102,071050,한국금융지주,stockMkt,기타 금융업,bank,"금융지주(은행 그룹으로 분류, PART V 한계 참고)"
+00136101,021880,메이슨캐피탈,kosdaqMkt,기타 금융업,cardcapital,카드/캐피탈
+00126292,029780,삼성카드,stockMkt,기타 금융업,cardcapital,카드/캐피탈
+00267942,016600,큐캐피탈,kosdaqMkt,기타 금융업,cardcapital,카드/캐피탈
+00149594,023760,한국캐피탈,kosdaqMkt,기타 금융업,cardcapital,카드/캐피탈
+00159102,005830,DB손해보험,stockMkt,보험업,insurance,보험/재보험
+00117267,082640,동양생명,stockMkt,보험업,insurance,보험/재보험
+00113562,000400,롯데손해보험,stockMkt,보험업,insurance,보험/재보험
+00112332,085620,미래에셋생명,stockMkt,보험업,insurance,보험/재보험
+00126256,032830,삼성생명,stockMkt,보험업,insurance,보험/재보험
+00139214,000810,삼성화재해상보험,stockMkt,보험업,insurance,보험/재보험
+00112998,031210,서울보증보험,stockMkt,보험업,insurance,보험/재보험
+00113191,003690,코리안리,stockMkt,재 보험업,insurance,보험/재보험
+00113058,088350,한화생명,stockMkt,보험업,insurance,보험/재보험
+00135917,000370,한화손해보험,stockMkt,보험업,insurance,보험/재보험
+00164973,001450,현대해상,stockMkt,보험업,insurance,보험/재보험
+00103176,000540,흥국화재,stockMkt,보험업,insurance,보험/재보험
+00115694,016610,DB증권,stockMkt,금융 지원 서비스업,securities,증권
+00330424,078020,LS증권,kosdaqMkt,금융 지원 서비스업,securities,증권
+00120182,005940,NH투자증권,stockMkt,금융 지원 서비스업,securities,증권
+00131850,001510,SK증권,stockMkt,금융 지원 서비스업,securities,증권
+00113359,030610,교보증권,stockMkt,금융 지원 서비스업,securities,증권
+00156859,030210,다올투자증권,stockMkt,금융 지원 서비스업,securities,증권
+00110893,003540,대신증권,stockMkt,금융 지원 서비스업,securities,증권
+00111722,006800,미래에셋증권,stockMkt,금융 지원 서비스업,securities,증권
+00123772,001270,부국증권,stockMkt,금융 지원 서비스업,securities,증권
+00104856,016360,삼성증권,stockMkt,금융 지원 서비스업,securities,증권
+00112059,001290,상상인증권,stockMkt,금융 지원 서비스업,securities,증권
+00136721,001720,신영증권,stockMkt,금융 지원 서비스업,securities,증권
+00117601,003470,유안타증권,stockMkt,금융 지원 서비스업,securities,증권
+00131054,001200,유진증권,stockMkt,금융 지원 서비스업,securities,증권
+00145190,003460,유화증권,stockMkt,금융 지원 서비스업,securities,증권
+00304915,190650,코리아에셋투자증권,kosdaqMkt,금융 지원 서비스업,securities,증권
+00296290,039490,키움증권,stockMkt,금융 지원 서비스업,securities,증권
+00162416,001750,한양증권,stockMkt,금융 지원 서비스업,securities,증권
+00148610,003530,한화투자증권,stockMkt,금융 지원 서비스업,securities,증권
+00137997,001500,현대차증권,stockMkt,금융 지원 서비스업,securities,증권

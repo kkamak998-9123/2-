@@ -1,0 +1,6 @@
+.env
+__pycache__/
+*.pyc
+webapp/data/*.db
+webapp/data/*.db.tmp
+*.log

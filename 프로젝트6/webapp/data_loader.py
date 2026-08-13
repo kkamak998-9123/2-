@@ -15,6 +15,10 @@ INDUSTRY_LABELS = {
     "defense": "방산",
     "semiconductor": "반도체",
     "construction": "건설",
+    "bank": "은행/지주",
+    "securities": "증권",
+    "insurance": "보험",
+    "cardcapital": "카드/캐피탈",
 }
 
 
@@ -91,12 +95,24 @@ def load_data():
     # 데이터 생성 과정에서 신원 정보가 통째로 비어버린 깨진 행 제외
     companies = companies[companies["corp_code"] != ""].copy()
 
+    # 금융업 4종(은행/증권/보험/카드캐피탈)은 companies_basic.csv(기존 Samil Project DB)에
+    # 없어서 별도 수집한 회사 기본정보를 병합
+    financial_companies = _read_csv("financial_companies_basic.csv")
+    financial_companies["corp_code"] = _normalize_corp_code(financial_companies["corp_code"])
+    financial_companies["stock_code"] = _clean_code(financial_companies["stock_code"])
+    new_codes = ~financial_companies["corp_code"].isin(set(companies["corp_code"]))
+    companies = pd.concat(
+        [companies, financial_companies.loc[new_codes, ["corp_code", "stock_code", "corp_name"]]],
+        ignore_index=True,
+    )
+
     industry_map = _read_csv("industry_map.csv")
     industry_map["corp_code"] = _normalize_corp_code(industry_map["corp_code"])
     industry_map = industry_map[industry_map["corp_code"] != ""].copy()
 
     financials = []
-    for industry_id in ("defense", "semiconductor", "construction"):
+    for industry_id in ("defense", "semiconductor", "construction",
+                        "bank", "securities", "insurance", "cardcapital"):
         df = _read_csv(f"{industry_id}.csv")
         df["corp_code"] = _normalize_corp_code(df["corp_code"])
         df["stock_code"] = _clean_code(df["stock_code"])
@@ -105,28 +121,27 @@ def load_data():
         financials.append(df)
     financials_df = pd.concat(financials, ignore_index=True)
 
-    # construction은 industry_map에 아직 없어서, 재무 데이터에 등장하는 것만으로 보강
+    # construction/금융업 4종은 industry_map에 아직 없어서, 재무 데이터에 등장하는 것만으로 보강
     existing_pairs = set(zip(industry_map["corp_code"], industry_map["industry_id"]))
-    construction_codes = financials_df.loc[
-        financials_df["industry_id"] == "construction", "corp_code"
-    ].unique()
     extra_rows = []
-    for code in construction_codes:
-        if (code, "construction") not in existing_pairs:
-            row = companies.loc[companies["corp_code"] == code]
-            corp_name = row["corp_name"].iloc[0] if len(row) else ""
-            stock_code = row["stock_code"].iloc[0] if len(row) else ""
-            extra_rows.append({
-                "corp_code": code,
-                "stock_code": stock_code,
-                "corp_name": corp_name,
-                "industry_id": "construction",
-                "is_primary": "TRUE",
-                "level": "B",
-                "level_category": "주요기업",
-                "memo": "",
-                "updated_at": "",
-            })
+    for industry_id in ("construction", "bank", "securities", "insurance", "cardcapital"):
+        codes = financials_df.loc[financials_df["industry_id"] == industry_id, "corp_code"].unique()
+        for code in codes:
+            if (code, industry_id) not in existing_pairs:
+                row = companies.loc[companies["corp_code"] == code]
+                corp_name = row["corp_name"].iloc[0] if len(row) else ""
+                stock_code = row["stock_code"].iloc[0] if len(row) else ""
+                extra_rows.append({
+                    "corp_code": code,
+                    "stock_code": stock_code,
+                    "corp_name": corp_name,
+                    "industry_id": industry_id,
+                    "is_primary": "TRUE",
+                    "level": "B",
+                    "level_category": "주요기업",
+                    "memo": "",
+                    "updated_at": "",
+                })
     if extra_rows:
         industry_map = pd.concat([industry_map, pd.DataFrame(extra_rows)], ignore_index=True)
 

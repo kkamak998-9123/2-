@@ -1,0 +1,535 @@
+<title>반도체 35사 재무비율 대시보드</title>
+<style>
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --surface-2: #e3e8ed;
+  --border: #d2d9e0;
+  --text: #1a1f27;
+  --text-dim: #5b6572;
+  --text-faint: #8993a1;
+  --accent: #b8722e;
+  --accent-soft: #b8722e1a;
+  --cool: #2f8a8a;
+  --cool-soft: #2f8a8a1a;
+  --good: #2f8f5f;
+  --good-soft: #2f8f5f17;
+  --warn: #b8891f;
+  --warn-soft: #b8891f17;
+  --bad: #b8503a;
+  --bad-soft: #b8503a17;
+  --shadow: 0 1px 2px rgba(20,25,35,0.06), 0 4px 14px rgba(20,25,35,0.05);
+  --radius: 7px;
+  --mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #10141a;
+    --surface: #181d25;
+    --surface-2: #202631;
+    --border: #2b3340;
+    --text: #e6e9ee;
+    --text-dim: #9aa4b2;
+    --text-faint: #6b7583;
+    --accent: #dd9955;
+    --accent-soft: #dd995524;
+    --cool: #5fc2c2;
+    --cool-soft: #5fc2c224;
+    --good: #5cbb85;
+    --good-soft: #5cbb8524;
+    --warn: #dbb35a;
+    --warn-soft: #dbb35a24;
+    --bad: #e07a63;
+    --bad-soft: #e07a6324;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10141a; --surface: #181d25; --surface-2: #202631; --border: #2b3340;
+  --text: #e6e9ee; --text-dim: #9aa4b2; --text-faint: #6b7583;
+  --accent: #dd9955; --accent-soft: #dd995524; --cool: #5fc2c2; --cool-soft: #5fc2c224;
+  --good: #5cbb85; --good-soft: #5cbb8524; --warn: #dbb35a; --warn-soft: #dbb35a24;
+  --bad: #e07a63; --bad-soft: #e07a6324;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.35);
+}
+:root[data-theme="light"] {
+  --bg: #eef1f4; --surface: #ffffff; --surface-2: #e3e8ed; --border: #d2d9e0;
+  --text: #1a1f27; --text-dim: #5b6572; --text-faint: #8993a1;
+  --accent: #b8722e; --accent-soft: #b8722e1a; --cool: #2f8a8a; --cool-soft: #2f8a8a1a;
+  --good: #2f8f5f; --good-soft: #2f8f5f17; --warn: #b8891f; --warn-soft: #b8891f17;
+  --bad: #b8503a; --bad-soft: #b8503a17;
+  --shadow: 0 1px 2px rgba(20,25,35,0.06), 0 4px 14px rgba(20,25,35,0.05);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-attachment: fixed;
+  background-position: -1px -1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+.wrap { max-width: 1320px; margin: 0 auto; padding: 28px 24px 60px; }
+
+/* ---- header ---- */
+header.top {
+  display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid var(--border);
+}
+.brand-eyebrow {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); font-weight: 600; margin: 0 0 6px;
+}
+h1 { font-family: var(--mono); font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { font-size: 12.5px; color: var(--text-dim); margin-top: 4px; font-family: var(--mono); }
+.controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.year-toggle { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.year-toggle button {
+  font-family: var(--mono); font-size: 12.5px; font-weight: 600; padding: 8px 14px; border: none;
+  background: transparent; color: var(--text-dim); cursor: pointer; border-right: 1px solid var(--border);
+}
+.year-toggle button:last-child { border-right: none; }
+.year-toggle button.active { background: var(--accent); color: #fff; }
+.year-toggle button:hover:not(.active) { background: var(--surface-2); color: var(--text); }
+.search-box {
+  font-family: var(--mono); font-size: 12.5px; padding: 8px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--surface); color: var(--text); width: 190px; box-shadow: var(--shadow);
+}
+.search-box:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.search-box::placeholder { color: var(--text-faint); }
+
+/* ---- KPI strip ---- */
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.kpi {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; box-shadow: var(--shadow);
+}
+.kpi-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; }
+.kpi-value { font-family: var(--mono); font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.kpi-value .unit { font-size: 14px; font-weight: 500; color: var(--text-dim); margin-left: 2px; }
+.kpi-note { font-size: 11.5px; color: var(--text-dim); margin-top: 5px; }
+
+/* ---- main layout ---- */
+.main-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 980px) { .main-grid { grid-template-columns: 1fr; } }
+
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between; padding: 13px 16px;
+  border-bottom: 1px solid var(--border); background: var(--surface-2);
+}
+.panel-title { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); }
+.panel-title b { color: var(--text); }
+
+/* ---- table ---- */
+.table-scroll { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+table.data th {
+  text-align: right; padding: 9px 10px; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-faint); font-weight: 600; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none;
+  position: sticky; top: 0; background: var(--surface);
+}
+table.data th:first-child, table.data td:first-child { text-align: left; position: sticky; left: 0; background: var(--surface); z-index: 1; }
+table.data th:hover { color: var(--accent); }
+table.data th.sorted { color: var(--accent); }
+table.data th .arrow { font-size: 9px; margin-left: 3px; }
+table.data td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+table.data tbody tr { cursor: pointer; }
+table.data tbody tr:hover td { background: var(--accent-soft); }
+table.data tbody tr.selected td { background: var(--cool-soft); }
+.co-name { font-weight: 600; color: var(--text); }
+.co-ticker { color: var(--text-faint); font-size: 10.5px; margin-left: 6px; }
+
+.badge {
+  display: inline-block; padding: 2px 7px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  font-variant-numeric: tabular-nums; min-width: 52px; text-align: center;
+}
+.badge.good { background: var(--good-soft); color: var(--good); }
+.badge.warn { background: var(--warn-soft); color: var(--warn); }
+.badge.bad  { background: var(--bad-soft);  color: var(--bad); }
+.badge.na   { background: var(--surface-2); color: var(--text-faint); }
+
+.spark-cell canvas { display: block; }
+
+/* ---- detail panel ---- */
+.detail-body { padding: 16px; }
+.detail-name { font-family: var(--mono); font-size: 18px; font-weight: 700; }
+.detail-ticker { font-family: var(--mono); font-size: 12px; color: var(--text-faint); margin-left: 6px; }
+.detail-tier { display: inline-block; margin-top: 6px; font-family: var(--mono); font-size: 10.5px; padding: 2px 8px; border-radius: 20px; background: var(--cool-soft); color: var(--cool); letter-spacing: 0.04em; }
+
+.mini-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+.mini-chart { border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; }
+.mini-chart .mc-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; display: flex; justify-content: space-between; }
+.mini-chart .mc-label b { color: var(--text); font-size: 13px; letter-spacing: 0; }
+.mini-chart .mc-label b .mc-amount { color: var(--text-faint); font-size: 11px; font-weight: 400; }
+.mini-chart canvas { display: block; width: 100%; height: 54px; }
+
+.metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-top: 16px; }
+.metric-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px dashed var(--border); }
+.metric-row .m-label { font-size: 12px; color: var(--text-dim); }
+.metric-row .m-value { font-family: var(--mono); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.empty-hint { padding: 40px 20px; text-align: center; color: var(--text-faint); font-size: 13px; }
+
+footer.notes { margin-top: 26px; font-size: 11.5px; color: var(--text-faint); font-family: var(--mono); line-height: 1.7; }
+footer.notes b { color: var(--text-dim); }
+
+@media (max-width: 700px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .metric-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="brand-eyebrow">KODEX 반도체 ETF · 재무 분석</p>
+      <h1>35개 기업 재무비율 대시보드</h1>
+      <p class="sub">Samil Project DB — semiconductor.csv 기반 · 2023–2025 · 19개 계정과목 → 15개 파생비율</p>
+    </div>
+    <div class="controls">
+      <input type="text" class="search-box" id="searchBox" placeholder="회사명 검색…" />
+      <div class="year-toggle" id="yearToggle">
+        <button data-year="2023">2023</button>
+        <button data-year="2024">2024</button>
+        <button data-year="2025" class="active">2025</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="kpis" id="kpiStrip"></div>
+
+  <div class="main-grid">
+    <section class="panel">
+      <div class="panel-head">
+        <span class="panel-title">기업별 비율 &middot; <b id="yearLabel">2025</b>년</span>
+        <span class="panel-title" id="rowCount"></span>
+      </div>
+      <div class="table-scroll">
+        <table class="data" id="dataTable">
+          <thead>
+            <tr>
+              <th data-key="name">기업</th>
+              <th data-key="revenue">매출액</th>
+              <th data-key="opm">영업이익률</th>
+              <th data-key="roe">ROE</th>
+              <th data-key="debtRatio">부채비율</th>
+              <th data-key="capexRatio">Capex/매출</th>
+              <th data-key="fcfMargin">FCF마진</th>
+              <th data-key="fixedAssetRatio">고정자산비율</th>
+              <th data-key="opmTrend">3개년 추이</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <span class="panel-title">기업 상세</span>
+      </div>
+      <div class="detail-body" id="detailBody"></div>
+    </section>
+  </div>
+
+  <footer class="notes">
+    <p><b>참고</b> — 유동비율·당좌비율은 유동자산/유동부채 세부 계정을 별도 추출하지 않아 계산에서 제외. 이자보상배수는 999배 초과 시 "999+"로 표기(거의 무차입 상태). 금액 단위: 조=10^12원, 억=10^8원. FCF = 영업활동현금흐름 − (유형자산+무형자산 취득). 고정자산비율 = (유형자산+무형자산) / 총자산.</p>
+  </footer>
+</div>
+
+<script>
+const DATA = [{"code": "00160843", "ticker": "068270", "name": "DB하이텍", "year": 2023, "revenue": 1154223638940.0, "opinc": 265437456373.0, "ni": 264149250979.0, "roe": 15.18, "roa": 12.93, "opm": 23.0, "gpm": 38.3, "sga": 15.3, "cogsRatio": 61.7, "debtRatio": 17.43, "equityRatio": 85.16, "intCov": 24.96, "assetTurn": 0.56, "invTurn": 8.72, "arTurn": 10.53, "capex": 335598542669.0, "capexRatio": 29.08, "fcf": -111340386903.0, "fcfMargin": -9.65, "ocf": 224258155766.0, "dividend": 56504612200.0, "fixedAssetRatio": 47.59}, {"code": "00160843", "ticker": "068270", "name": "DB하이텍", "year": 2024, "revenue": 1131167709804.0, "opinc": 190838683363.0, "ni": 229385888355.0, "roe": 11.47, "roa": 9.57, "opm": 16.87, "gpm": 34.2, "sga": 17.33, "cogsRatio": 65.8, "debtRatio": 19.8, "equityRatio": 83.47, "intCov": 14.15, "assetTurn": 0.47, "invTurn": 10.57, "arTurn": 11.26, "capex": 133532467595.0, "capexRatio": 11.8, "fcf": 249101906230.0, "fcfMargin": 22.02, "ocf": 382634373825.0, "dividend": 24248339817.0, "fixedAssetRatio": 48.41}, {"code": "00160843", "ticker": "068270", "name": "DB하이텍", "year": 2025, "revenue": 1397233307039.0, "opinc": 277294561174.0, "ni": 252582440798.0, "roe": 11.26, "roa": 8.44, "opm": 19.85, "gpm": 35.81, "sga": 15.97, "cogsRatio": 64.19, "debtRatio": 33.36, "equityRatio": 74.99, "intCov": 9.08, "assetTurn": 0.47, "invTurn": 9.2, "arTurn": 10.35, "capex": 154293743682.0, "capexRatio": 11.04, "fcf": 202673281799.0, "fcfMargin": 14.51, "ocf": 356967025481.0, "dividend": 50540816400.0, "fixedAssetRatio": 43.71}, {"code": "01199550", "ticker": "267260", "name": "HD현대에너지솔루션", "year": 2023, "revenue": 546119805992.0, "opinc": 17542859732.0, "ni": -2863877616.0, "roe": -0.77, "roa": -0.57, "opm": 3.21, "gpm": 11.57, "sga": 8.35, "cogsRatio": 88.43, "debtRatio": 35.12, "equityRatio": 74.01, "intCov": 1.13, "assetTurn": 1.09, "invTurn": 2.87, "arTurn": 6.4, "capex": 11044278035.0, "capexRatio": 2.02, "fcf": 64739436526.0, "fcfMargin": 11.85, "ocf": 75783714561.0, "dividend": 6720000000.0, "fixedAssetRatio": 20.91}, {"code": "01199550", "ticker": "267260", "name": "HD현대에너지솔루션", "year": 2024, "revenue": 422371216357.0, "opinc": 3502725251.0, "ni": 114228449.0, "roe": 0.03, "roa": 0.03, "opm": 0.83, "gpm": 11.22, "sga": 10.39, "cogsRatio": 88.78, "debtRatio": 22.75, "equityRatio": 81.47, "intCov": 0.41, "assetTurn": 0.93, "invTurn": 4.5, "arTurn": 5.39, "capex": 16633673710.0, "capexRatio": 3.94, "fcf": 66815045543.0, "fcfMargin": 15.82, "ocf": 83448719253.0, "dividend": 0.0, "fixedAssetRatio": 21.39}, {"code": "01199550", "ticker": "267260", "name": "HD현대에너지솔루션", "year": 2025, "revenue": 492659873672.0, "opinc": 41222890455.0, "ni": 41676678809.0, "roe": 9.98, "roa": 7.86, "opm": 8.37, "gpm": 21.57, "sga": 13.2, "cogsRatio": 78.43, "debtRatio": 26.96, "equityRatio": 78.76, "intCov": 4.29, "assetTurn": 0.93, "invTurn": 4.05, "arTurn": 3.76, "capex": 18588334690.0, "capexRatio": 3.77, "fcf": -866278321.0, "fcfMargin": -0.18, "ocf": 17722056369.0, "dividend": 0.0, "fixedAssetRatio": 20.31}, {"code": "01288827", "ticker": "061970", "name": "HPSP", "year": 2023, "revenue": 179086660832.0, "opinc": 95206074427.0, "ni": 80432402487.0, "roe": 29.03, "roa": 25.08, "opm": 53.16, "gpm": 66.22, "sga": 13.06, "cogsRatio": 33.78, "debtRatio": 15.74, "equityRatio": 86.4, "intCov": 558.19, "assetTurn": 0.56, "invTurn": 2.5, "arTurn": 81.22, "capex": 26182308022.0, "capexRatio": 14.62, "fcf": 64135825947.0, "fcfMargin": 35.81, "ocf": 90318133969.0, "dividend": 1813462500.0, "fixedAssetRatio": 13.1}, {"code": "01288827", "ticker": "061970", "name": "HPSP", "year": 2024, "revenue": 181401607828.0, "opinc": 93945693775.0, "ni": 86280231062.0, "roe": 31.05, "roa": 26.97, "opm": 51.79, "gpm": 71.45, "sga": 19.66, "cogsRatio": 28.55, "debtRatio": 15.11, "equityRatio": 86.88, "intCov": 919.91, "assetTurn": 0.57, "invTurn": 2.24, "arTurn": 19.01, "capex": 43573347016.0, "capexRatio": 24.02, "fcf": 54363350965.0, "fcfMargin": 29.97, "ocf": 97936697981.0, "dividend": 7487141100.0, "fixedAssetRatio": 16.08}, {"code": "01288827", "ticker": "061970", "name": "HPSP", "year": 2025, "revenue": 172964572189.0, "opinc": 89902342748.0, "ni": 72662225546.0, "roe": 23.57, "roa": 19.65, "opm": 51.98, "gpm": 73.02, "sga": 21.04, "cogsRatio": 26.98, "debtRatio": 19.94, "equityRatio": 83.37, "intCov": 1516.91, "assetTurn": 0.47, "invTurn": 2.92, "arTurn": 7.47, "capex": 2429181005.0, "capexRatio": 1.4, "fcf": 97775957385.0, "fcfMargin": 56.53, "ocf": 100205138390.0, "dividend": 48219203400.0, "fixedAssetRatio": 13.24}, {"code": "00572905", "ticker": "024800", "name": "ISC", "year": 2023, "revenue": 140221939908.0, "opinc": 10736706776.0, "ni": 13583247114.0, "roe": 2.87, "roa": 2.51, "opm": 7.66, "gpm": 39.34, "sga": 31.68, "cogsRatio": 60.66, "debtRatio": 14.44, "equityRatio": 87.38, "intCov": 5.05, "assetTurn": 0.26, "invTurn": 5.51, "arTurn": 5.37, "capex": 14616174060.0, "capexRatio": 10.42, "fcf": 7762449575.0, "fcfMargin": 5.54, "ocf": 22378623635.0, "dividend": 9999963000.0, "fixedAssetRatio": 21.08}, {"code": "00572905", "ticker": "024800", "name": "ISC", "year": 2024, "revenue": 174480093980.0, "opinc": 44784268057.0, "ni": 54898977342.0, "roe": 10.49, "roa": 9.42, "opm": 25.67, "gpm": 42.64, "sga": 16.97, "cogsRatio": 57.36, "debtRatio": 11.42, "equityRatio": 89.75, "intCov": 6.09, "assetTurn": 0.3, "invTurn": 6.48, "arTurn": 5.3, "capex": 11643076884.0, "capexRatio": 6.67, "fcf": 39029355986.0, "fcfMargin": 22.37, "ocf": 50672432870.0, "dividend": 4092838400.0, "fixedAssetRatio": 16.61}, {"code": "00572905", "ticker": "024800", "name": "ISC", "year": 2025, "revenue": 220194751972.0, "opinc": 60053887115.0, "ni": 56343270511.0, "roe": 10.49, "roa": 9.05, "opm": 27.27, "gpm": 44.39, "sga": 17.11, "cogsRatio": 55.61, "debtRatio": 15.85, "equityRatio": 86.32, "intCov": 6.58, "assetTurn": 0.35, "invTurn": 4.9, "arTurn": 3.15, "capex": 6334135777.0, "capexRatio": 2.88, "fcf": 35377885221.0, "fcfMargin": 16.07, "ocf": 41712020998.0, "dividend": 16575995520.0, "fixedAssetRatio": 15.66}, {"code": "00525934", "ticker": "148040", "name": "LX세미콘", "year": 2023, "revenue": 1901444975029.0, "opinc": 129035656339.0, "ni": 101203533006.0, "roe": 10.36, "roa": 8.4, "opm": 6.79, "gpm": 28.08, "sga": 21.3, "cogsRatio": 71.92, "debtRatio": 23.37, "equityRatio": 81.05, "intCov": 5.16, "assetTurn": 1.58, "invTurn": 4.07, "arTurn": 9.28, "capex": 52669759922.0, "capexRatio": 2.77, "fcf": 49735274029.0, "fcfMargin": 2.62, "ocf": 102405033951.0, "dividend": 73189350000.0, "fixedAssetRatio": 14.8}, {"code": "00525934", "ticker": "148040", "name": "LX세미콘", "year": 2024, "revenue": 1865621538499.0, "opinc": 167076803816.0, "ni": 130509153930.0, "roe": 12.09, "roa": 8.7, "opm": 8.96, "gpm": 33.01, "sga": 24.06, "cogsRatio": 66.99, "debtRatio": 38.92, "equityRatio": 71.98, "intCov": 4.94, "assetTurn": 1.24, "invTurn": 5.91, "arTurn": 4.16, "capex": 42041532765.0, "capexRatio": 2.25, "fcf": 126825971782.0, "fcfMargin": 6.8, "ocf": 168867504547.0, "dividend": 29275659685.0, "fixedAssetRatio": 13.04}, {"code": "00525934", "ticker": "148040", "name": "LX세미콘", "year": 2025, "revenue": 1639070665791.0, "opinc": 108856055553.0, "ni": 82633081344.0, "roe": 7.34, "roa": 5.9, "opm": 6.64, "gpm": 31.92, "sga": 25.28, "cogsRatio": 68.08, "debtRatio": 24.36, "equityRatio": 80.41, "intCov": 6.3, "assetTurn": 1.17, "invTurn": 5.77, "arTurn": 4.62, "capex": 29147204043.0, "capexRatio": 1.78, "fcf": 107939328796.0, "fcfMargin": 6.59, "ocf": 137086532839.0, "dividend": 39034211466.0, "fixedAssetRatio": 13.88}, {"code": "01078178", "ticker": "204210", "name": "RFHIC", "year": 2023, "revenue": 111432998779.0, "opinc": 303024279.0, "ni": 17683006519.0, "roe": 5.39, "roa": 3.47, "opm": 0.27, "gpm": 33.02, "sga": 32.63, "cogsRatio": 66.98, "debtRatio": 55.17, "equityRatio": 64.44, "intCov": 0.04, "assetTurn": 0.22, "invTurn": 0.95, "arTurn": 6.04, "capex": 43839957406.0, "capexRatio": 39.34, "fcf": -27880893811.0, "fcfMargin": -25.02, "ocf": 15959063595.0, "dividend": 3110876800.0, "fixedAssetRatio": 24.4}, {"code": "01078178", "ticker": "204210", "name": "RFHIC", "year": 2024, "revenue": 114875963020.0, "opinc": 1529788265.0, "ni": 19698779772.0, "roe": 5.5, "roa": 4.08, "opm": 1.33, "gpm": 31.03, "sga": 29.7, "cogsRatio": 68.97, "debtRatio": 34.92, "equityRatio": 74.12, "intCov": 0.25, "assetTurn": 0.24, "invTurn": 1.06, "arTurn": 4.27, "capex": 24922565124.0, "capexRatio": 21.7, "fcf": 7499427281.0, "fcfMargin": 6.53, "ocf": 32421992405.0, "dividend": 2589913400.0, "fixedAssetRatio": 25.07}, {"code": "01078178", "ticker": "204210", "name": "RFHIC", "year": 2025, "revenue": 185803786324.0, "opinc": 30889493523.0, "ni": 35505822915.0, "roe": 8.96, "roa": 6.5, "opm": 16.62, "gpm": 34.58, "sga": 17.95, "cogsRatio": 65.42, "debtRatio": 37.77, "equityRatio": 72.59, "intCov": 6.35, "assetTurn": 0.34, "invTurn": 1.37, "arTurn": 3.99, "capex": 5208727390.0, "capexRatio": 2.8, "fcf": 24290498488.0, "fcfMargin": 13.07, "ocf": 29499225878.0, "dividend": 2542087800.0, "fixedAssetRatio": 21.9}, {"code": "00301246", "ticker": "007920", "name": "SFA반도체", "year": 2023, "revenue": 437586077155.0, "opinc": -16710120338.0, "ni": -14043612067.0, "roe": -2.99, "roa": -2.3, "opm": -3.82, "gpm": -0.15, "sga": 3.67, "cogsRatio": 100.15, "debtRatio": 29.72, "equityRatio": 77.09, "intCov": -3.95, "assetTurn": 0.72, "invTurn": 11.28, "arTurn": 10.12, "capex": 27199934255.0, "capexRatio": 6.22, "fcf": 8815830292.0, "fcfMargin": 2.01, "ocf": 36015764547.0, "dividend": 440002957.0, "fixedAssetRatio": 62.74}, {"code": "00301246", "ticker": "007920", "name": "SFA반도체", "year": 2024, "revenue": 400482861805.0, "opinc": -31004226.0, "ni": 20458863208.0, "roe": 4.11, "roa": 3.28, "opm": -0.01, "gpm": 3.27, "sga": 3.28, "cogsRatio": 96.73, "debtRatio": 25.22, "equityRatio": 79.86, "intCov": -0.01, "assetTurn": 0.64, "invTurn": 12.35, "arTurn": 11.42, "capex": 36625507913.0, "capexRatio": 9.15, "fcf": 16454888166.0, "fcfMargin": 4.11, "ocf": 53080396079.0, "dividend": 0.0, "fixedAssetRatio": 62.78}, {"code": "00301246", "ticker": "007920", "name": "SFA반도체", "year": 2025, "revenue": 367389147993.0, "opinc": -19626671175.0, "ni": -19130997781.0, "roe": -4.05, "roa": -3.48, "opm": -5.34, "gpm": -1.45, "sga": 3.89, "cogsRatio": 101.45, "debtRatio": 16.21, "equityRatio": 86.05, "intCov": -5.72, "assetTurn": 0.67, "invTurn": 9.93, "arTurn": 7.2, "capex": 22059925984.0, "capexRatio": 6.0, "fcf": -16603600772.0, "fcfMargin": -4.52, "ocf": 5456325212.0, "dividend": 0.0, "fixedAssetRatio": 66.36}, {"code": "00164779", "ticker": "000660", "name": "SK하이닉스", "year": 2023, "revenue": 32765719000000.0, "opinc": -7730313000000.0, "ni": -9137547000000.0, "roe": -17.08, "roa": -9.11, "opm": -23.59, "gpm": -1.63, "sga": 21.96, "cogsRatio": 101.63, "debtRatio": 87.52, "equityRatio": 53.33, "intCov": -1.27, "assetTurn": 0.33, "invTurn": 2.47, "arTurn": 4.96, "capex": 8779848000000.0, "capexRatio": 26.8, "fcf": -4501657000000.0, "fcfMargin": -13.74, "ocf": 4278191000000.0, "dividend": 825575000000.0, "fixedAssetRatio": 56.35}, {"code": "00164779", "ticker": "000660", "name": "SK하이닉스", "year": 2024, "revenue": 66192960000000.0, "opinc": 23467319000000.0, "ni": 19796902000000.0, "roe": 26.78, "roa": 16.52, "opm": 35.45, "gpm": 48.08, "sga": 12.63, "cogsRatio": 51.92, "debtRatio": 62.15, "equityRatio": 61.67, "intCov": 4.11, "assetTurn": 0.55, "invTurn": 2.58, "arTurn": 5.08, "capex": 16662640000000.0, "capexRatio": 25.17, "fcf": 13133245000000.0, "fcfMargin": 19.84, "ocf": 29795885000000.0, "dividend": 826323000000.0, "fixedAssetRatio": 53.54}, {"code": "00164779", "ticker": "000660", "name": "SK하이닉스", "year": 2025, "revenue": 97146675000000.0, "opinc": 47206319000000.0, "ni": 42947902000000.0, "roe": 35.59, "roa": 24.39, "opm": 48.59, "gpm": 60.41, "sga": 11.82, "cogsRatio": 39.59, "debtRatio": 45.95, "equityRatio": 68.52, "intCov": 3.77, "assetTurn": 0.55, "invTurn": 2.69, "arTurn": 5.34, "capex": 28579343000000.0, "capexRatio": 29.42, "fcf": 24793783000000.0, "fcfMargin": 25.52, "ocf": 53373126000000.0, "dividend": 1681166000000.0, "fixedAssetRatio": 46.31}, {"code": "01364747", "ticker": "052690", "name": "가온칩스", "year": 2023, "revenue": 63597349804.0, "opinc": 4351646460.0, "ni": 6344445918.0, "roe": 10.23, "roa": 6.71, "opm": 6.84, "gpm": 20.0, "sga": 13.16, "cogsRatio": 80.0, "debtRatio": 52.55, "equityRatio": 65.55, "intCov": 5.19, "assetTurn": 0.67, "invTurn": null, "arTurn": 3.82, "capex": 10884020503.0, "capexRatio": 17.11, "fcf": -5217669564.0, "fcfMargin": -8.2, "ocf": 5666350939.0, "dividend": 0.0, "fixedAssetRatio": 22.05}, {"code": "01364747", "ticker": "052690", "name": "가온칩스", "year": 2024, "revenue": 96492001688.0, "opinc": 3524912928.0, "ni": 7530549168.0, "roe": 10.86, "roa": 6.68, "opm": 3.65, "gpm": 14.76, "sga": 11.11, "cogsRatio": 85.24, "debtRatio": 62.51, "equityRatio": 61.53, "intCov": 1.51, "assetTurn": 0.86, "invTurn": null, "arTurn": 5.16, "capex": 10798869694.0, "capexRatio": 11.19, "fcf": 5048709.0, "fcfMargin": 0.01, "ocf": 10803918403.0, "dividend": 0.0, "fixedAssetRatio": 23.12}, {"code": "01364747", "ticker": "052690", "name": "가온칩스", "year": 2025, "revenue": 68510181008.0, "opinc": -16721496228.0, "ni": -14369143365.0, "roe": -26.27, "roa": -9.02, "opm": -24.41, "gpm": -7.61, "sga": 16.8, "cogsRatio": 107.61, "debtRatio": 191.31, "equityRatio": 34.33, "intCov": -1.85, "assetTurn": 0.43, "invTurn": 69.46, "arTurn": 11.15, "capex": 8330257678.0, "capexRatio": 12.16, "fcf": -9178988137.0, "fcfMargin": -13.4, "ocf": -848730459.0, "dividend": 0.0, "fixedAssetRatio": 18.21}, {"code": "00579999", "ticker": "092220", "name": "고영", "year": 2023, "revenue": 225630691398.0, "opinc": 20372226090.0, "ni": 21925959777.0, "roe": 7.18, "roa": 5.97, "opm": 9.03, "gpm": 64.49, "sga": 37.01, "cogsRatio": 35.51, "debtRatio": 20.27, "equityRatio": 83.14, "intCov": 29.35, "assetTurn": 0.61, "invTurn": 1.6, "arTurn": 2.72, "capex": 10231944518.0, "capexRatio": 4.53, "fcf": 19308259865.0, "fcfMargin": 8.56, "ocf": 29540204383.0, "dividend": 9383403960.0, "fixedAssetRatio": 15.33}, {"code": "00579999", "ticker": "092220", "name": "고영", "year": 2024, "revenue": 202538127214.0, "opinc": 3322352718.0, "ni": 20998990602.0, "roe": 6.5, "roa": 5.56, "opm": 1.64, "gpm": 62.14, "sga": 40.22, "cogsRatio": 37.86, "debtRatio": 16.95, "equityRatio": 85.51, "intCov": 6.59, "assetTurn": 0.54, "invTurn": 1.53, "arTurn": 2.79, "capex": 8648141330.0, "capexRatio": 4.27, "fcf": 27747465314.0, "fcfMargin": 13.7, "ocf": 36395606644.0, "dividend": 9183975920.0, "fixedAssetRatio": 15.61}, {"code": "00579999", "ticker": "092220", "name": "고영", "year": 2025, "revenue": 232647218656.0, "opinc": 17342338477.0, "ni": 14756087568.0, "roe": 4.4, "roa": 3.6, "opm": 7.45, "gpm": 63.86, "sga": 41.89, "cogsRatio": 36.14, "debtRatio": 22.43, "equityRatio": 81.68, "intCov": 23.49, "assetTurn": 0.57, "invTurn": 1.66, "arTurn": 2.19, "capex": 13483943478.0, "capexRatio": 5.8, "fcf": 4606285831.0, "fcfMargin": 1.98, "ocf": 18090229309.0, "dividend": 9237228000.0, "fixedAssetRatio": 15.93}, {"code": "01080252", "ticker": "396770", "name": "넥스틴", "year": 2023, "revenue": 87930571023.0, "opinc": 36165536410.0, "ni": 30933600268.0, "roe": 24.36, "roa": 21.64, "opm": 41.13, "gpm": 70.88, "sga": 29.75, "cogsRatio": 29.12, "debtRatio": 12.56, "equityRatio": 88.84, "intCov": 19.32, "assetTurn": 0.62, "invTurn": 0.49, "arTurn": 10.09, "capex": 16630048050.0, "capexRatio": 18.91, "fcf": -16233108982.0, "fcfMargin": -18.46, "ocf": 396939068.0, "dividend": 4932296500.0, "fixedAssetRatio": 18.31}, {"code": "01080252", "ticker": "396770", "name": "넥스틴", "year": 2024, "revenue": 113719875873.0, "opinc": 46974727733.0, "ni": 38427640891.0, "roe": 24.38, "roa": 20.24, "opm": 41.31, "gpm": 69.93, "sga": 28.62, "cogsRatio": 30.07, "debtRatio": 20.41, "equityRatio": 83.05, "intCov": 32.12, "assetTurn": 0.6, "invTurn": 0.62, "arTurn": 8.31, "capex": 15836121029.0, "capexRatio": 13.93, "fcf": 26922050473.0, "fcfMargin": 23.67, "ocf": 42758171502.0, "dividend": 5093125500.0, "fixedAssetRatio": 19.79}, {"code": "01080252", "ticker": "396770", "name": "넥스틴", "year": 2025, "revenue": 66914327141.0, "opinc": -1160803724.0, "ni": -2645744570.0, "roe": -1.76, "roa": -1.19, "opm": -1.73, "gpm": 48.65, "sga": 50.39, "cogsRatio": 51.35, "debtRatio": 48.45, "equityRatio": 67.36, "intCov": -0.86, "assetTurn": 0.3, "invTurn": 0.57, "arTurn": 10.85, "capex": 30459468030.0, "capexRatio": 45.52, "fcf": -41568110981.0, "fcfMargin": -62.12, "ocf": -11108642951.0, "dividend": 5138818500.0, "fixedAssetRatio": 33.61}, {"code": "01061558", "ticker": "126340", "name": "덕산네오룩스", "year": 2023, "revenue": 163702143267.0, "opinc": 32919649532.0, "ni": 35804054122.0, "roe": 10.14, "roa": 8.86, "opm": 20.11, "gpm": 35.09, "sga": 14.98, "cogsRatio": 64.91, "debtRatio": 14.48, "equityRatio": 87.35, "intCov": 21.88, "assetTurn": 0.4, "invTurn": 3.45, "arTurn": 18.4, "capex": 15989737507.0, "capexRatio": 9.77, "fcf": 33964922105.0, "fcfMargin": 20.75, "ocf": 49954659612.0, "dividend": 0.0, "fixedAssetRatio": 40.29}, {"code": "01061558", "ticker": "126340", "name": "덕산네오룩스", "year": 2024, "revenue": 212252223722.0, "opinc": 52471548274.0, "ni": 45760807753.0, "roe": 11.47, "roa": 10.12, "opm": 24.72, "gpm": 38.41, "sga": 13.69, "cogsRatio": 61.59, "debtRatio": 13.36, "equityRatio": 88.21, "intCov": 14.94, "assetTurn": 0.47, "invTurn": 4.15, "arTurn": 14.42, "capex": 20159609146.0, "capexRatio": 9.5, "fcf": 38667962602.0, "fcfMargin": 18.22, "ocf": 58827571748.0, "dividend": 0.0, "fixedAssetRatio": 37.87}, {"code": "01061558", "ticker": "126340", "name": "덕산네오룩스", "year": 2025, "revenue": 344309797191.0, "opinc": 60742428308.0, "ni": 53957306202.0, "roe": 11.47, "roa": 7.56, "opm": 17.64, "gpm": 33.71, "sga": 16.07, "cogsRatio": 66.29, "debtRatio": 51.8, "equityRatio": 65.88, "intCov": 8.75, "assetTurn": 0.48, "invTurn": 3.47, "arTurn": 5.09, "capex": 14062370495.0, "capexRatio": 4.08, "fcf": 46492172868.0, "fcfMargin": 13.5, "ocf": 60554543363.0, "dividend": 0.0, "fixedAssetRatio": 37.47}, {"code": "00563545", "ticker": "367770", "name": "두산테스나", "year": 2023, "revenue": 338652254525.0, "opinc": 60778799323.0, "ni": 49077381672.0, "roe": 12.16, "roa": 6.43, "opm": 17.95, "gpm": 24.52, "sga": 6.57, "cogsRatio": 75.48, "debtRatio": 89.06, "equityRatio": 52.89, "intCov": 3.29, "assetTurn": 0.44, "invTurn": null, "arTurn": 9.09, "capex": 174030855647.0, "capexRatio": 51.39, "fcf": 36515666059.0, "fcfMargin": 10.78, "ocf": 210546521706.0, "dividend": 2718647040.0, "fixedAssetRatio": 76.38}, {"code": "00563545", "ticker": "367770", "name": "두산테스나", "year": 2024, "revenue": 373117930000.0, "opinc": 37923282000.0, "ni": 36781312000.0, "roe": 8.4, "roa": 4.67, "opm": 10.16, "gpm": 18.17, "sga": 8.01, "cogsRatio": 81.83, "debtRatio": 79.98, "equityRatio": 55.56, "intCov": 2.44, "assetTurn": 0.47, "invTurn": 499.94, "arTurn": 10.52, "capex": 183592765000.0, "capexRatio": 49.21, "fcf": 35644389000.0, "fcfMargin": 9.55, "ocf": 219237154000.0, "dividend": 3078165000.0, "fixedAssetRatio": 76.35}, {"code": "00563545", "ticker": "367770", "name": "두산테스나", "year": 2025, "revenue": 303874072000.0, "opinc": -940826000.0, "ni": 1510043000.0, "roe": 0.35, "roa": 0.21, "opm": -0.31, "gpm": 9.72, "sga": 10.03, "cogsRatio": 90.28, "debtRatio": 61.02, "equityRatio": 62.1, "intCov": -0.08, "assetTurn": 0.43, "invTurn": 1074.04, "arTurn": 8.3, "capex": 24797148000.0, "capexRatio": 8.16, "fcf": 122421186000.0, "fcfMargin": 40.29, "ocf": 147218334000.0, "dividend": 3078165000.0, "fixedAssetRatio": 65.88}, {"code": "00369657", "ticker": "058430", "name": "리노공업", "year": 2023, "revenue": 255573034656.0, "opinc": 114378400291.0, "ni": 110923015440.0, "roe": 19.91, "roa": 19.03, "opm": 44.75, "gpm": 50.21, "sga": 5.46, "cogsRatio": 49.79, "debtRatio": 4.63, "equityRatio": 95.57, "intCov": 12127.5, "assetTurn": 0.44, "invTurn": 8.93, "arTurn": 8.57, "capex": 69025942542.0, "capexRatio": 27.01, "fcf": 41365079486.0, "fcfMargin": 16.19, "ocf": 110391022028.0, "dividend": 45537360000.0, "fixedAssetRatio": 31.75}, {"code": "00369657", "ticker": "058430", "name": "리노공업", "year": 2024, "revenue": 278186189427.0, "opinc": 124201343872.0, "ni": 113279046428.0, "roe": 18.19, "roa": 17.23, "opm": 44.65, "gpm": 49.67, "sga": 5.02, "cogsRatio": 50.33, "debtRatio": 5.59, "equityRatio": 94.7, "intCov": 16332.95, "assetTurn": 0.42, "invTurn": 10.8, "arTurn": 5.45, "capex": 12015508531.0, "capexRatio": 4.32, "fcf": 98091088534.0, "fcfMargin": 35.26, "ocf": 110106597065.0, "dividend": 45537360000.0, "fixedAssetRatio": 27.88}, {"code": "00369657", "ticker": "058430", "name": "리노공업", "year": 2025, "revenue": 372534084608.0, "opinc": 176997188289.0, "ni": 151960670406.0, "roe": 20.78, "roa": 19.19, "opm": 47.51, "gpm": 52.18, "sga": 4.67, "cogsRatio": 47.82, "debtRatio": 8.3, "equityRatio": 92.33, "intCov": 27254.14, "assetTurn": 0.47, "invTurn": 11.48, "arTurn": 7.05, "capex": 60236331180.0, "capexRatio": 16.17, "fcf": 119232515194.0, "fcfMargin": 32.01, "ocf": 179468846374.0, "dividend": 45537360000.0, "fixedAssetRatio": 29.03}, {"code": "00126380", "ticker": "005930", "name": "삼성전자", "year": 2023, "revenue": 258935494000000.0, "opinc": 6566976000000.0, "ni": 15487100000000.0, "roe": 4.26, "roa": 3.4, "opm": 2.54, "gpm": 30.33, "sga": 27.8, "cogsRatio": 69.67, "debtRatio": 25.36, "equityRatio": 79.77, "intCov": 0.52, "assetTurn": 0.57, "invTurn": 3.49, "arTurn": 7.07, "capex": 60534167000000.0, "capexRatio": 23.38, "fcf": -16396740000000.0, "fcfMargin": -6.33, "ocf": 44137427000000.0, "dividend": 9864474000000.0, "fixedAssetRatio": 46.06}, {"code": "00126380", "ticker": "005930", "name": "삼성전자", "year": 2024, "revenue": 300870903000000.0, "opinc": 32725961000000.0, "ni": 34451351000000.0, "roe": 8.57, "roa": 6.7, "opm": 10.88, "gpm": 37.99, "sga": 27.12, "cogsRatio": 62.01, "debtRatio": 27.93, "equityRatio": 78.17, "intCov": 2.52, "assetTurn": 0.58, "invTurn": 3.6, "arTurn": 6.9, "capex": 53741639000000.0, "capexRatio": 17.86, "fcf": 19240982000000.0, "fcfMargin": 6.4, "ocf": 72982621000000.0, "dividend": 10888749000000.0, "fixedAssetRatio": 44.64}, {"code": "00126380", "ticker": "005930", "name": "삼성전자", "year": 2025, "revenue": 333605938000000.0, "opinc": 43601051000000.0, "ni": 45206805000000.0, "roe": 10.36, "roa": 7.97, "opm": 13.07, "gpm": 39.38, "sga": 26.31, "cogsRatio": 60.62, "debtRatio": 29.94, "equityRatio": 76.96, "intCov": 3.72, "assetTurn": 0.59, "invTurn": 3.84, "arTurn": 6.52, "capex": 52153149000000.0, "capexRatio": 15.63, "fcf": 33161999000000.0, "fcfMargin": 9.94, "ocf": 85315148000000.0, "dividend": 9897183000000.0, "fixedAssetRatio": 43.18}, {"code": "01095722", "ticker": "058650", "name": "심텍", "year": 2023, "revenue": 1041895724977.0, "opinc": -88124119458.0, "ni": -115143871777.0, "roe": -24.48, "roa": -9.79, "opm": -8.46, "gpm": 2.73, "sga": 11.19, "cogsRatio": 97.27, "debtRatio": 149.99, "equityRatio": 40.0, "intCov": -1.42, "assetTurn": 0.89, "invTurn": 7.14, "arTurn": 3.65, "capex": 140452395452.0, "capexRatio": 13.48, "fcf": -233853109263.0, "fcfMargin": -22.44, "ocf": -93400713811.0, "dividend": 15922938500.0, "fixedAssetRatio": 55.38}, {"code": "01095722", "ticker": "058650", "name": "심텍", "year": 2024, "revenue": 1231421381070.0, "opinc": -46969220820.0, "ni": -31044704373.0, "roe": -6.92, "roa": -2.15, "opm": -3.81, "gpm": 4.22, "sga": 8.03, "cogsRatio": 95.78, "debtRatio": 221.82, "equityRatio": 31.07, "intCov": -0.58, "assetTurn": 0.85, "invTurn": 7.66, "arTurn": 2.93, "capex": 103602286141.0, "capexRatio": 8.41, "fcf": -264859982684.0, "fcfMargin": -21.51, "ocf": -161257696543.0, "dividend": 5095340320.0, "fixedAssetRatio": 45.68}, {"code": "01095722", "ticker": "058650", "name": "심텍", "year": 2025, "revenue": 1410559919451.0, "opinc": 11868602919.0, "ni": -164580357473.0, "roe": -28.55, "roa": -10.16, "opm": 0.84, "gpm": 8.75, "sga": 7.91, "cogsRatio": 91.25, "debtRatio": 181.13, "equityRatio": 35.57, "intCov": 0.05, "assetTurn": 0.87, "invTurn": 5.37, "arTurn": 2.31, "capex": 56393883078.0, "capexRatio": 4.0, "fcf": -255005833696.0, "fcfMargin": -18.08, "ocf": -198611950618.0, "dividend": 4184587700.0, "fixedAssetRatio": 37.13}, {"code": "00411048", "ticker": "034230", "name": "에스앤에스텍", "year": 2023, "revenue": 150320408224.0, "opinc": 25039402690.0, "ni": 25854851119.0, "roe": 11.71, "roa": 10.07, "opm": 16.66, "gpm": 31.03, "sga": 14.37, "cogsRatio": 68.97, "debtRatio": 16.29, "equityRatio": 85.99, "intCov": 7.53, "assetTurn": 0.59, "invTurn": 5.24, "arTurn": 4.46, "capex": 21333105393.0, "capexRatio": 14.19, "fcf": 4224600803.0, "fcfMargin": 2.81, "ocf": 25557706196.0, "dividend": 3124540500.0, "fixedAssetRatio": 45.91}, {"code": "00411048", "ticker": "034230", "name": "에스앤에스텍", "year": 2024, "revenue": 176013891367.0, "opinc": 29478688017.0, "ni": 30313647619.0, "roe": 12.28, "roa": 10.21, "opm": 16.75, "gpm": 33.8, "sga": 17.05, "cogsRatio": 66.2, "debtRatio": 20.33, "equityRatio": 83.1, "intCov": 10.64, "assetTurn": 0.59, "invTurn": 3.7, "arTurn": 4.71, "capex": 19851078112.0, "capexRatio": 11.28, "fcf": 16197250977.0, "fcfMargin": 9.2, "ocf": 36048329089.0, "dividend": 3154540500.0, "fixedAssetRatio": 42.73}, {"code": "00411048", "ticker": "034230", "name": "에스앤에스텍", "year": 2025, "revenue": 243733252593.0, "opinc": 50389752346.0, "ni": 58092807910.0, "roe": 19.09, "roa": 14.78, "opm": 20.67, "gpm": 34.72, "sga": 14.04, "cogsRatio": 65.28, "debtRatio": 29.18, "equityRatio": 77.41, "intCov": 9.65, "assetTurn": 0.62, "invTurn": 4.92, "arTurn": 4.19, "capex": 64473291305.0, "capexRatio": 26.45, "fcf": -17591245132.0, "fcfMargin": -7.22, "ocf": 46882046173.0, "dividend": 3124440600.0, "fixedAssetRatio": 46.33}, {"code": "01109539", "ticker": "041920", "name": "와이씨", "year": 2023, "revenue": 255182306180.0, "opinc": 8571578913.0, "ni": 12879225237.0, "roe": 3.52, "roa": 2.68, "opm": 3.36, "gpm": 19.35, "sga": 15.99, "cogsRatio": 80.65, "debtRatio": 31.29, "equityRatio": 76.17, "intCov": 2.2, "assetTurn": 0.53, "invTurn": 3.26, "arTurn": 36.45, "capex": 83880138497.0, "capexRatio": 32.87, "fcf": -59798410617.0, "fcfMargin": -23.43, "ocf": 24081727880.0, "dividend": 0.0, "fixedAssetRatio": 47.42}, {"code": "01109539", "ticker": "041920", "name": "와이씨", "year": 2024, "revenue": 211241210832.0, "opinc": 10599506307.0, "ni": 12926037556.0, "roe": 3.09, "roa": 2.24, "opm": 5.02, "gpm": 27.67, "sga": 22.65, "cogsRatio": 72.33, "debtRatio": 37.93, "equityRatio": 72.5, "intCov": 0.71, "assetTurn": 0.37, "invTurn": 1.18, "arTurn": 15.29, "capex": 26984065297.0, "capexRatio": 12.77, "fcf": -50536836520.0, "fcfMargin": -23.92, "ocf": -23552771223.0, "dividend": 0.0, "fixedAssetRatio": 42.65}, {"code": "01109539", "ticker": "041920", "name": "와이씨", "year": 2025, "revenue": 272629978227.0, "opinc": 16989848287.0, "ni": 28984367217.0, "roe": 6.09, "roa": 4.77, "opm": 6.23, "gpm": 26.27, "sga": 20.04, "cogsRatio": 73.73, "debtRatio": 27.51, "equityRatio": 78.43, "intCov": 1.54, "assetTurn": 0.45, "invTurn": 2.4, "arTurn": 20.82, "capex": 16644390074.0, "capexRatio": 6.11, "fcf": 24548396143.0, "fcfMargin": 9.0, "ocf": 41192786217.0, "dividend": 0.0, "fixedAssetRatio": 40.69}, {"code": "01135941", "ticker": "240810", "name": "원익IPS", "year": 2023, "revenue": 690337586778.0, "opinc": -18074991250.0, "ni": -13507700947.0, "roe": -1.56, "roa": -1.25, "opm": -2.62, "gpm": 39.97, "sga": 18.75, "cogsRatio": 60.03, "debtRatio": 25.17, "equityRatio": 79.89, "intCov": -4.61, "assetTurn": 0.64, "invTurn": 1.22, "arTurn": 9.35, "capex": 64566846697.0, "capexRatio": 9.35, "fcf": -76882029734.0, "fcfMargin": -11.14, "ocf": -12315183037.0, "dividend": 9581070390.0, "fixedAssetRatio": 34.66}, {"code": "01135941", "ticker": "240810", "name": "원익IPS", "year": 2024, "revenue": 748176487524.0, "opinc": 10641636214.0, "ni": 20748346848.0, "roe": 2.34, "roa": 1.85, "opm": 1.42, "gpm": 39.07, "sga": 16.77, "cogsRatio": 60.93, "debtRatio": 26.67, "equityRatio": 78.95, "intCov": 0.93, "assetTurn": 0.67, "invTurn": 1.35, "arTurn": 7.51, "capex": 31756103666.0, "capexRatio": 4.24, "fcf": 46524400785.0, "fcfMargin": 6.22, "ocf": 78280504451.0, "dividend": 0.0, "fixedAssetRatio": 32.14}, {"code": "01135941", "ticker": "240810", "name": "원익IPS", "year": 2025, "revenue": 909795691103.0, "opinc": 73814129967.0, "ni": 84028556164.0, "roe": 8.66, "roa": 7.22, "opm": 8.11, "gpm": 42.08, "sga": 15.56, "cogsRatio": 57.92, "debtRatio": 20.06, "equityRatio": 83.29, "intCov": 107.15, "assetTurn": 0.78, "invTurn": 1.93, "arTurn": 12.67, "capex": 32003350977.0, "capexRatio": 3.52, "fcf": 124603677379.0, "fcfMargin": 13.7, "ocf": 156607028356.0, "dividend": 2432778850.0, "fixedAssetRatio": 30.07}, {"code": "00531014", "ticker": "039440", "name": "유진테크", "year": 2023, "revenue": 276533350776.0, "opinc": 24325728964.0, "ni": 25397015593.0, "roe": 6.89, "roa": 5.81, "opm": 8.8, "gpm": 45.44, "sga": 36.64, "cogsRatio": 54.56, "debtRatio": 18.59, "equityRatio": 84.32, "intCov": 49.65, "assetTurn": 0.63, "invTurn": 1.48, "arTurn": 33.22, "capex": 11847134802.0, "capexRatio": 4.28, "fcf": 35846753992.0, "fcfMargin": 12.96, "ocf": 47693888794.0, "dividend": 5994627270.0, "fixedAssetRatio": 29.23}, {"code": "00531014", "ticker": "039440", "name": "유진테크", "year": 2024, "revenue": 338067812312.0, "opinc": 61177012897.0, "ni": 65440277257.0, "roe": 15.02, "roa": 12.13, "opm": 18.1, "gpm": 49.01, "sga": 30.92, "cogsRatio": 50.99, "debtRatio": 23.81, "equityRatio": 80.77, "intCov": 38.89, "assetTurn": 0.63, "invTurn": 1.6, "arTurn": 7.55, "capex": 10541803711.0, "capexRatio": 3.12, "fcf": 50960865830.0, "fcfMargin": 15.07, "ocf": 61502669541.0, "dividend": 4441464650.0, "fixedAssetRatio": 24.12}, {"code": "00531014", "ticker": "039440", "name": "유진테크", "year": 2025, "revenue": 350324287104.0, "opinc": 51671713116.0, "ni": 44481997780.0, "roe": 9.05, "roa": 7.66, "opm": 14.75, "gpm": 48.8, "sga": 34.05, "cogsRatio": 51.2, "debtRatio": 18.16, "equityRatio": 84.63, "intCov": 35.26, "assetTurn": 0.6, "invTurn": 1.96, "arTurn": 8.7, "capex": 21800571197.0, "capexRatio": 6.22, "fcf": 44676247043.0, "fcfMargin": 12.75, "ocf": 66476818240.0, "dividend": 5112974350.0, "fixedAssetRatio": 23.35}, {"code": "00246417", "ticker": "011930", "name": "이오테크닉스", "year": 2023, "revenue": 316384019477.0, "opinc": 28334755251.0, "ni": 36393252840.0, "roe": 6.47, "roa": 5.95, "opm": 8.96, "gpm": 26.91, "sga": 17.95, "cogsRatio": 73.09, "debtRatio": 8.75, "equityRatio": 91.95, "intCov": 2.45, "assetTurn": 0.52, "invTurn": 1.71, "arTurn": 3.79, "capex": 6233870463.0, "capexRatio": 1.97, "fcf": 25349560527.0, "fcfMargin": 8.01, "ocf": 31583430990.0, "dividend": 12102153000.0, "fixedAssetRatio": 18.38}, {"code": "00246417", "ticker": "011930", "name": "이오테크닉스", "year": 2024, "revenue": 320945496298.0, "opinc": 31201085341.0, "ni": 42670270031.0, "roe": 7.08, "roa": 6.53, "opm": 9.72, "gpm": 27.74, "sga": 18.02, "cogsRatio": 72.26, "debtRatio": 8.29, "equityRatio": 92.35, "intCov": 3.85, "assetTurn": 0.49, "invTurn": 2.06, "arTurn": 3.18, "capex": 64008894879.0, "capexRatio": 19.94, "fcf": -8647784112.0, "fcfMargin": -2.69, "ocf": 55361110767.0, "dividend": 5445968850.0, "fixedAssetRatio": 21.27}, {"code": "00246417", "ticker": "011930", "name": "이오테크닉스", "year": 2025, "revenue": 380890608578.0, "opinc": 80753274993.0, "ni": 57564773290.0, "roe": 8.37, "roa": 7.4, "opm": 21.2, "gpm": 36.52, "sga": 15.32, "cogsRatio": 63.48, "debtRatio": 13.06, "equityRatio": 88.45, "intCov": 4.38, "assetTurn": 0.49, "invTurn": 2.1, "arTurn": 4.33, "capex": 4080135163.0, "capexRatio": 1.07, "fcf": 96207641419.0, "fcfMargin": 25.26, "ocf": 100287776582.0, "dividend": 6051076500.0, "fixedAssetRatio": 19.84}, {"code": "00447487", "ticker": "090460", "name": "제주반도체", "year": 2023, "revenue": 145899793599.0, "opinc": 17838425308.0, "ni": 16919765330.0, "roe": 10.67, "roa": 8.52, "opm": 12.23, "gpm": 25.78, "sga": 13.56, "cogsRatio": 74.22, "debtRatio": 25.29, "equityRatio": 79.81, "intCov": 23.12, "assetTurn": 0.73, "invTurn": 1.49, "arTurn": 2.24, "capex": 1870189813.0, "capexRatio": 1.28, "fcf": 640670112.0, "fcfMargin": 0.44, "ocf": 2510859925.0, "dividend": 0.0, "fixedAssetRatio": 2.39}, {"code": "00447487", "ticker": "090460", "name": "제주반도체", "year": 2024, "revenue": 162349945455.0, "opinc": 9581360274.0, "ni": 19405207353.0, "roe": 10.53, "roa": 8.61, "opm": 5.9, "gpm": 21.81, "sga": 15.91, "cogsRatio": 78.19, "debtRatio": 22.36, "equityRatio": 81.73, "intCov": 11.87, "assetTurn": 0.72, "invTurn": 1.27, "arTurn": 2.49, "capex": 2853816163.0, "capexRatio": 1.76, "fcf": -12535903389.0, "fcfMargin": -7.72, "ocf": -9682087226.0, "dividend": 1080000000.0, "fixedAssetRatio": 2.52}, {"code": "00447487", "ticker": "090460", "name": "제주반도체", "year": 2025, "revenue": 302230571186.0, "opinc": 35873972312.0, "ni": 39499088944.0, "roe": 17.39, "roa": 11.76, "opm": 11.87, "gpm": 21.16, "sga": 9.29, "cogsRatio": 78.84, "debtRatio": 47.94, "equityRatio": 67.59, "intCov": 23.72, "assetTurn": 0.9, "invTurn": 2.52, "arTurn": 3.03, "capex": 2724757610.0, "capexRatio": 0.9, "fcf": 22830145551.0, "fcfMargin": 7.55, "ocf": 25554903161.0, "dividend": 0.0, "fixedAssetRatio": 1.95}, {"code": "00252135", "ticker": "036930", "name": "주성엔지니어링", "year": 2023, "revenue": 284745246660.0, "opinc": 28937462812.0, "ni": 34000802285.0, "roe": 6.61, "roa": 4.22, "opm": 10.16, "gpm": 52.72, "sga": 42.55, "cogsRatio": 47.28, "debtRatio": 56.44, "equityRatio": 63.92, "intCov": 7.22, "assetTurn": 0.35, "invTurn": 1.66, "arTurn": 16.71, "capex": 14431416647.0, "capexRatio": 5.07, "fcf": -13544786944.0, "fcfMargin": -4.76, "ocf": 886629703.0, "dividend": 9231716034.0, "fixedAssetRatio": 36.78}, {"code": "00252135", "ticker": "036930", "name": "주성엔지니어링", "year": 2024, "revenue": 409393371588.0, "opinc": 97196211588.0, "ni": 106814110967.0, "roe": 18.85, "roa": 10.82, "opm": 23.74, "gpm": 60.81, "sga": 37.07, "cogsRatio": 39.19, "debtRatio": 74.17, "equityRatio": 57.42, "intCov": 26.67, "assetTurn": 0.41, "invTurn": 1.59, "arTurn": 14.27, "capex": 30999739416.0, "capexRatio": 7.57, "fcf": 193672990747.0, "fcfMargin": 47.31, "ocf": 224672730163.0, "dividend": 2363416050.0, "fixedAssetRatio": 31.77}, {"code": "00252135", "ticker": "036930", "name": "주성엔지니어링", "year": 2025, "revenue": 310692584812.0, "opinc": 31257811742.0, "ni": 35693416702.0, "roe": 6.05, "roa": 4.02, "opm": 10.06, "gpm": 57.07, "sga": 47.01, "cogsRatio": 42.93, "debtRatio": 50.37, "equityRatio": 66.5, "intCov": 8.04, "assetTurn": 0.35, "invTurn": 2.23, "arTurn": 25.79, "capex": 39882652553.0, "capexRatio": 12.84, "fcf": -70560812691.0, "fcfMargin": -22.71, "ocf": -30678160138.0, "dividend": 13114155614.0, "fixedAssetRatio": 37.61}, {"code": "01261893", "ticker": "063770", "name": "케이씨텍", "year": 2023, "revenue": 286909703428.0, "opinc": 32703769328.0, "ni": 31700589259.0, "roe": 7.0, "roa": 6.34, "opm": 11.4, "gpm": 34.29, "sga": 22.89, "cogsRatio": 65.71, "debtRatio": 10.46, "equityRatio": 90.53, "intCov": 159.03, "assetTurn": 0.57, "invTurn": 2.26, "arTurn": 12.16, "capex": 13713625643.0, "capexRatio": 4.78, "fcf": 12872837406.0, "fcfMargin": 4.49, "ocf": 26586463049.0, "dividend": 5072515250.0, "fixedAssetRatio": 20.75}, {"code": "01261893", "ticker": "063770", "name": "케이씨텍", "year": 2024, "revenue": 385433971366.0, "opinc": 49783492468.0, "ni": 52685900043.0, "roe": 10.93, "roa": 9.59, "opm": 12.92, "gpm": 32.12, "sga": 19.2, "cogsRatio": 67.88, "debtRatio": 13.97, "equityRatio": 87.75, "intCov": 261.73, "assetTurn": 0.7, "invTurn": 4.03, "arTurn": 12.48, "capex": 11980566732.0, "capexRatio": 3.11, "fcf": 87933630789.0, "fcfMargin": 22.81, "ocf": 99914197521.0, "dividend": 3652210980.0, "fixedAssetRatio": 18.31}, {"code": "01261893", "ticker": "063770", "name": "케이씨텍", "year": 2025, "revenue": 382856574357.0, "opinc": 59965538593.0, "ni": 53392149112.0, "roe": 10.07, "roa": 8.89, "opm": 15.66, "gpm": 37.22, "sga": 21.56, "cogsRatio": 62.78, "debtRatio": 13.25, "equityRatio": 88.3, "intCov": 468.74, "assetTurn": 0.64, "invTurn": 2.87, "arTurn": 14.01, "capex": 28624647219.0, "capexRatio": 7.48, "fcf": 31532741701.0, "fcfMargin": 8.24, "ocf": 60157388920.0, "dividend": 5326738470.0, "fixedAssetRatio": 19.46}, {"code": "00997812", "ticker": "054450", "name": "코미코", "year": 2023, "revenue": 307266896921.0, "opinc": 33028446745.0, "ni": 45511244117.0, "roe": 15.8, "roa": 7.66, "opm": 10.75, "gpm": 37.97, "sga": 27.18, "cogsRatio": 62.03, "debtRatio": 106.23, "equityRatio": 48.49, "intCov": 3.07, "assetTurn": 0.52, "invTurn": 5.49, "arTurn": 7.68, "capex": 33610526077.0, "capexRatio": 10.94, "fcf": 31555716129.0, "fcfMargin": 10.27, "ocf": 65166242206.0, "dividend": 9940569000.0, "fixedAssetRatio": 47.83}, {"code": "00997812", "ticker": "054450", "name": "코미코", "year": 2024, "revenue": 507138644286.0, "opinc": 112461653836.0, "ni": 87845843289.0, "roe": 23.38, "roa": 10.98, "opm": 22.18, "gpm": 46.3, "sga": 24.04, "cogsRatio": 53.7, "debtRatio": 113.02, "equityRatio": 46.94, "intCov": 7.38, "assetTurn": 0.63, "invTurn": 6.1, "arTurn": 7.69, "capex": 155807052841.0, "capexRatio": 30.72, "fcf": -40178001744.0, "fcfMargin": -7.92, "ocf": 115629051097.0, "dividend": 6993809400.0, "fixedAssetRatio": 51.66}, {"code": "00997812", "ticker": "054450", "name": "코미코", "year": 2025, "revenue": 604110117086.0, "opinc": 110992280574.0, "ni": 77237204024.0, "roe": 20.89, "roa": 7.5, "opm": 18.37, "gpm": 43.14, "sga": 24.5, "cogsRatio": 56.86, "debtRatio": 178.59, "equityRatio": 35.9, "intCov": 3.77, "assetTurn": 0.59, "invTurn": 5.86, "arTurn": 7.18, "capex": 219722124141.0, "capexRatio": 36.37, "fcf": -181500754425.0, "fcfMargin": -30.04, "ocf": 38221369716.0, "dividend": 15854315810.0, "fixedAssetRatio": 63.3}, {"code": "01366000", "ticker": "323280", "name": "태성", "year": 2023, "revenue": 33338955327.0, "opinc": -685706946.0, "ni": -1416588755.0, "roe": -4.59, "roa": -2.49, "opm": -2.06, "gpm": 15.64, "sga": 17.7, "cogsRatio": 84.36, "debtRatio": 84.44, "equityRatio": 54.22, "intCov": -1.07, "assetTurn": 0.59, "invTurn": 2.54, "arTurn": 3.72, "capex": 4159872322.0, "capexRatio": 12.48, "fcf": 3724117530.0, "fcfMargin": 11.17, "ocf": 7883989852.0, "dividend": 0.0, "fixedAssetRatio": 44.61}, {"code": "01366000", "ticker": "323280", "name": "태성", "year": 2024, "revenue": 59212420040.0, "opinc": 6037657086.0, "ni": 5968175094.0, "roe": 14.56, "roa": 7.5, "opm": 10.2, "gpm": 24.59, "sga": 14.39, "cogsRatio": 75.41, "debtRatio": 94.26, "equityRatio": 51.48, "intCov": 11.1, "assetTurn": 0.74, "invTurn": 5.76, "arTurn": 4.75, "capex": 21257371589.0, "capexRatio": 35.9, "fcf": -16770523329.0, "fcfMargin": -28.32, "ocf": 4486848260.0, "dividend": 0.0, "fixedAssetRatio": 56.98}, {"code": "01366000", "ticker": "323280", "name": "태성", "year": 2025, "revenue": 37859245040.0, "opinc": -2506348104.0, "ni": -2537179508.0, "roe": -1.98, "roa": -1.47, "opm": -6.62, "gpm": 20.18, "sga": 26.8, "cogsRatio": 79.82, "debtRatio": 34.7, "equityRatio": 74.24, "intCov": -8.55, "assetTurn": 0.22, "invTurn": 2.47, "arTurn": 2.85, "capex": 40089736286.0, "capexRatio": 105.89, "fcf": -49838462284.0, "fcfMargin": -131.64, "ocf": -9748725998.0, "dividend": 0.0, "fixedAssetRatio": 53.46}, {"code": "00535676", "ticker": "204940", "name": "테크윙", "year": 2023, "revenue": 133604260260.0, "opinc": 3160487054.0, "ni": -11097331447.0, "roe": -5.15, "roa": -2.28, "opm": 2.37, "gpm": 37.09, "sga": 34.72, "cogsRatio": 62.91, "debtRatio": 125.38, "equityRatio": 44.37, "intCov": 0.49, "assetTurn": 0.27, "invTurn": 1.03, "arTurn": 3.28, "capex": 53156721996.0, "capexRatio": 39.79, "fcf": -32785204732.0, "fcfMargin": -24.54, "ocf": 20371517264.0, "dividend": 4646261620.0, "fixedAssetRatio": 60.01}, {"code": "00535676", "ticker": "204940", "name": "테크윙", "year": 2024, "revenue": 185507171034.0, "opinc": 23411077264.0, "ni": -21970453220.0, "roe": -11.67, "roa": -4.34, "opm": 12.62, "gpm": 38.54, "sga": 25.92, "cogsRatio": 61.46, "debtRatio": 168.83, "equityRatio": 37.2, "intCov": 1.46, "assetTurn": 0.37, "invTurn": 1.44, "arTurn": 4.21, "capex": 54009419996.0, "capexRatio": 29.11, "fcf": -21287142372.0, "fcfMargin": -11.48, "ocf": 32722277624.0, "dividend": 4646261620.0, "fixedAssetRatio": 48.15}, {"code": "00535676", "ticker": "204940", "name": "테크윙", "year": 2025, "revenue": 159128398402.0, "opinc": 15837572847.0, "ni": 8996126448.0, "roe": 4.24, "roa": 1.42, "opm": 9.95, "gpm": 42.23, "sga": 32.27, "cogsRatio": 57.77, "debtRatio": 198.75, "equityRatio": 33.47, "intCov": 1.15, "assetTurn": 0.25, "invTurn": 0.81, "arTurn": 3.86, "capex": 30859754604.0, "capexRatio": 19.39, "fcf": -46948808391.0, "fcfMargin": -29.5, "ocf": -16089053787.0, "dividend": 4646261620.0, "fixedAssetRatio": 42.16}, {"code": "00245472", "ticker": "036620", "name": "티씨케이", "year": 2023, "revenue": 226652881531.0, "opinc": 66702958305.0, "ni": 61244566663.0, "roe": 13.36, "roa": 12.36, "opm": 29.43, "gpm": 40.56, "sga": 11.1, "cogsRatio": 59.44, "debtRatio": 8.12, "equityRatio": 92.49, "intCov": 2417.34, "assetTurn": 0.46, "invTurn": 2.04, "arTurn": 5.58, "capex": 46924455088.0, "capexRatio": 20.7, "fcf": -25944812415.0, "fcfMargin": -11.45, "ocf": 20979642673.0, "dividend": 19847500000.0, "fixedAssetRatio": 32.17}, {"code": "00245472", "ticker": "036620", "name": "티씨케이", "year": 2024, "revenue": 275724843444.0, "opinc": 80747924196.0, "ni": 71994036570.0, "roe": 13.95, "roa": 12.78, "opm": 29.29, "gpm": 37.77, "sga": 8.45, "cogsRatio": 62.23, "debtRatio": 9.16, "equityRatio": 91.61, "intCov": 2525.64, "assetTurn": 0.49, "invTurn": 2.49, "arTurn": 5.79, "capex": 7131703093.0, "capexRatio": 2.59, "fcf": 67285469421.0, "fcfMargin": 24.4, "ocf": 74417172514.0, "dividend": 14010000000.0, "fixedAssetRatio": 27.05}, {"code": "00245472", "ticker": "036620", "name": "티씨케이", "year": 2025, "revenue": 301334302844.0, "opinc": 83887319363.0, "ni": 69902724552.0, "roe": 13.46, "roa": 12.32, "opm": 27.84, "gpm": 36.43, "sga": 8.59, "cogsRatio": 63.57, "debtRatio": 9.3, "equityRatio": 91.49, "intCov": 2262.21, "assetTurn": 0.53, "invTurn": 2.25, "arTurn": 6.59, "capex": 4578659307.0, "capexRatio": 1.52, "fcf": 49532775005.0, "fcfMargin": 16.44, "ocf": 54111434312.0, "dividend": 16461750000.0, "fixedAssetRatio": 25.32}, {"code": "01292291", "ticker": "224110", "name": "파두", "year": 2023, "revenue": 22470905715.0, "opinc": -58569439226.0, "ni": -56832521397.0, "roe": -30.5, "roa": -23.32, "opm": -260.65, "gpm": 49.38, "sga": 310.02, "cogsRatio": 50.62, "debtRatio": 30.76, "equityRatio": 76.48, "intCov": -24.64, "assetTurn": 0.09, "invTurn": 0.65, "arTurn": 13.9, "capex": 10926728372.0, "capexRatio": 48.63, "fcf": -53091558711.0, "fcfMargin": -236.27, "ocf": -42164830339.0, "dividend": 0.0, "fixedAssetRatio": 13.63}, {"code": "01292291", "ticker": "224110", "name": "파두", "year": 2024, "revenue": 43502744974.0, "opinc": -95048300908.0, "ni": -91508531301.0, "roe": -93.43, "roa": -68.07, "opm": -218.49, "gpm": 13.26, "sga": 231.75, "cogsRatio": 86.74, "debtRatio": 37.25, "equityRatio": 72.86, "intCov": -27.54, "assetTurn": 0.32, "invTurn": 1.2, "arTurn": 3.13, "capex": 4864622867.0, "capexRatio": 11.18, "fcf": -113704944427.0, "fcfMargin": -261.37, "ocf": -108840321560.0, "dividend": 0.0, "fixedAssetRatio": 16.07}, {"code": "01292291", "ticker": "224110", "name": "파두", "year": 2025, "revenue": 92419333233.0, "opinc": -65469985712.0, "ni": -76218175613.0, "roe": -385.05, "roa": -62.26, "opm": -70.84, "gpm": 47.24, "sga": 118.08, "cogsRatio": 52.76, "debtRatio": 518.5, "equityRatio": 16.17, "intCov": -4.28, "assetTurn": 0.75, "invTurn": 1.18, "arTurn": 16.11, "capex": 3986019991.0, "capexRatio": 4.31, "fcf": -7689561860.0, "fcfMargin": -8.32, "ocf": -3703541869.0, "dividend": 0.0, "fixedAssetRatio": 12.1}, {"code": "01365825", "ticker": "066800", "name": "피에스케이", "year": 2023, "revenue": 351863805650.0, "opinc": 54118591422.0, "ni": 52520188202.0, "roe": 13.38, "roa": 10.62, "opm": 15.38, "gpm": 46.78, "sga": 31.4, "cogsRatio": 53.22, "debtRatio": 25.94, "equityRatio": 79.4, "intCov": 4.96, "assetTurn": 0.71, "invTurn": 1.6, "arTurn": 9.26, "capex": 26124402786.0, "capexRatio": 7.42, "fcf": 24157067229.0, "fcfMargin": 6.87, "ocf": 50281470015.0, "dividend": 11586685600.0, "fixedAssetRatio": 16.26}, {"code": "01365825", "ticker": "066800", "name": "피에스케이", "year": 2024, "revenue": 398050977575.0, "opinc": 83924423263.0, "ni": 79128216285.0, "roe": 16.77, "roa": 13.9, "opm": 21.08, "gpm": 52.66, "sga": 31.57, "cogsRatio": 47.34, "debtRatio": 20.7, "equityRatio": 82.85, "intCov": 7.34, "assetTurn": 0.7, "invTurn": 1.74, "arTurn": 6.65, "capex": 27315322203.0, "capexRatio": 6.86, "fcf": 39926104990.0, "fcfMargin": 10.03, "ocf": 67241427193.0, "dividend": 5793342800.0, "fixedAssetRatio": 18.04}, {"code": "01365825", "ticker": "066800", "name": "피에스케이", "year": 2025, "revenue": 457213151918.0, "opinc": 88494057075.0, "ni": 78545663379.0, "roe": 14.57, "roa": 12.16, "opm": 19.36, "gpm": 48.82, "sga": 29.47, "cogsRatio": 51.18, "debtRatio": 19.84, "equityRatio": 83.44, "intCov": 5.48, "assetTurn": 0.71, "invTurn": 2.25, "arTurn": 4.58, "capex": 18533513572.0, "capexRatio": 4.05, "fcf": 43197623309.0, "fcfMargin": 9.45, "ocf": 61731136881.0, "dividend": 11586685600.0, "fixedAssetRatio": 17.4}, {"code": "00208444", "ticker": "020960", "name": "피에스케이홀딩스", "year": 2023, "revenue": 94716683944.0, "opinc": 26970755131.0, "ni": 42696378649.0, "roe": 12.51, "roa": 10.64, "opm": 28.48, "gpm": 61.09, "sga": 32.62, "cogsRatio": 38.91, "debtRatio": 17.62, "equityRatio": 85.02, "intCov": 12.74, "assetTurn": 0.24, "invTurn": 2.08, "arTurn": 5.91, "capex": 18366790124.0, "capexRatio": 19.39, "fcf": 14091542770.0, "fcfMargin": 14.88, "ocf": 32458332894.0, "dividend": 10187398000.0, "fixedAssetRatio": 14.99}, {"code": "00208444", "ticker": "020960", "name": "피에스케이홀딩스", "year": 2024, "revenue": 215508095005.0, "opinc": 88482980891.0, "ni": 95820109996.0, "roe": 22.21, "roa": 18.66, "opm": 41.06, "gpm": 63.02, "sga": 21.96, "cogsRatio": 36.98, "debtRatio": 19.03, "equityRatio": 84.01, "intCov": 9.97, "assetTurn": 0.42, "invTurn": 2.79, "arTurn": 5.62, "capex": 285104432.0, "capexRatio": 0.13, "fcf": 66340111508.0, "fcfMargin": 30.78, "ocf": 66625215940.0, "dividend": 12937437000.0, "fixedAssetRatio": 16.17}, {"code": "00208444", "ticker": "020960", "name": "피에스케이홀딩스", "year": 2025, "revenue": 207764042799.0, "opinc": 73400914769.0, "ni": 91684937183.0, "roe": 18.11, "roa": 15.68, "opm": 35.33, "gpm": 62.85, "sga": 27.52, "cogsRatio": 37.15, "debtRatio": 15.5, "equityRatio": 86.58, "intCov": 10.34, "assetTurn": 0.36, "invTurn": 2.91, "arTurn": 7.57, "capex": 2188813255.0, "capexRatio": 1.05, "fcf": 79228459016.0, "fcfMargin": 38.13, "ocf": 81417272271.0, "dividend": 15093676500.0, "fixedAssetRatio": 13.42}, {"code": "00938721", "ticker": "039030", "name": "필옵틱스", "year": 2023, "revenue": 300001066109.0, "opinc": 10265296884.0, "ni": -43359457048.0, "roe": -24.52, "roa": -9.62, "opm": 3.42, "gpm": 14.55, "sga": 11.13, "cogsRatio": 85.45, "debtRatio": 154.96, "equityRatio": 39.22, "intCov": 0.17, "assetTurn": 0.67, "invTurn": 2.15, "arTurn": 18.92, "capex": 32342432960.0, "capexRatio": 10.78, "fcf": 78751474493.0, "fcfMargin": 26.25, "ocf": 111093907453.0, "dividend": 3654690714.0, "fixedAssetRatio": 30.4}, {"code": "00938721", "ticker": "039030", "name": "필옵틱스", "year": 2024, "revenue": 410893768511.0, "opinc": 13796035047.0, "ni": 28841292819.0, "roe": 14.46, "roa": 7.54, "opm": 3.36, "gpm": 16.93, "sga": 13.57, "cogsRatio": 83.07, "debtRatio": 91.87, "equityRatio": 52.12, "intCov": 3.7, "assetTurn": 1.07, "invTurn": 5.17, "arTurn": 16.85, "capex": 11966609565.0, "capexRatio": 2.91, "fcf": -51361172109.0, "fcfMargin": -12.5, "ocf": -39394562544.0, "dividend": 3220547584.0, "fixedAssetRatio": 37.43}, {"code": "00938721", "ticker": "039030", "name": "필옵틱스", "year": 2025, "revenue": 103440867014.0, "opinc": -34892060535.0, "ni": -26429550668.0, "roe": -13.79, "roa": -6.89, "opm": -33.73, "gpm": 7.71, "sga": 41.44, "cogsRatio": 92.29, "debtRatio": 100.09, "equityRatio": 49.98, "intCov": -7.66, "assetTurn": 0.27, "invTurn": 1.66, "arTurn": 4.47, "capex": 14267960986.0, "capexRatio": 13.79, "fcf": -4744079990.0, "fcfMargin": -4.59, "ocf": 9523880996.0, "dividend": 828560860.0, "fixedAssetRatio": 39.1}, {"code": "00445054", "ticker": "081370", "name": "하나마이크론", "year": 2023, "revenue": 967971484717.0, "opinc": 57904676214.0, "ni": 963094987.0, "roe": 0.18, "roa": 0.06, "opm": 5.98, "gpm": 13.11, "sga": 7.13, "cogsRatio": 86.89, "debtRatio": 216.89, "equityRatio": 31.56, "intCov": 0.99, "assetTurn": 0.56, "invTurn": 4.95, "arTurn": 12.01, "capex": 330985034836.0, "capexRatio": 34.19, "fcf": -247869940268.0, "fcfMargin": -25.61, "ocf": 83115094568.0, "dividend": 6086456750.0, "fixedAssetRatio": 60.19}, {"code": "00445054", "ticker": "081370", "name": "하나마이크론", "year": 2024, "revenue": 1250692575645.0, "opinc": 106792878899.0, "ni": -11157290055.0, "roe": -1.84, "roa": -0.57, "opm": 8.54, "gpm": 15.2, "sga": 6.67, "cogsRatio": 84.8, "debtRatio": 220.99, "equityRatio": 31.15, "intCov": 0.87, "assetTurn": 0.64, "invTurn": 6.42, "arTurn": 5.76, "capex": 152851513081.0, "capexRatio": 12.22, "fcf": -111880483192.0, "fcfMargin": -8.95, "ocf": 40971029889.0, "dividend": 4780167350.0, "fixedAssetRatio": 55.18}, {"code": "00445054", "ticker": "081370", "name": "하나마이크론", "year": 2025, "revenue": 1534418874072.0, "opinc": 127689329155.0, "ni": 65578519945.0, "roe": 10.05, "roa": 3.25, "opm": 8.32, "gpm": 13.84, "sga": 5.51, "cogsRatio": 86.16, "debtRatio": 209.16, "equityRatio": 32.35, "intCov": 1.45, "assetTurn": 0.76, "invTurn": 5.35, "arTurn": 5.92, "capex": 150629250001.0, "capexRatio": 9.82, "fcf": 24289644575.0, "fcfMargin": 1.58, "ocf": 174918894576.0, "dividend": 7448200680.0, "fixedAssetRatio": 52.44}, {"code": "00660750", "ticker": "205470", "name": "하나머티리얼즈", "year": 2023, "revenue": 233576716299.0, "opinc": 41282810386.0, "ni": 34193789438.0, "roe": 8.55, "roa": 5.08, "opm": 17.67, "gpm": 28.28, "sga": 10.6, "cogsRatio": 71.72, "debtRatio": 68.27, "equityRatio": 59.43, "intCov": 10.23, "assetTurn": 0.35, "invTurn": 2.21, "arTurn": 16.26, "capex": 121868006266.0, "capexRatio": 52.17, "fcf": -77672366689.0, "fcfMargin": -33.25, "ocf": 44195639577.0, "dividend": 5856120600.0, "fixedAssetRatio": 53.4}, {"code": "00660750", "ticker": "205470", "name": "하나머티리얼즈", "year": 2024, "revenue": 251646191336.0, "opinc": 43411736320.0, "ni": 31756594796.0, "roe": 8.98, "roa": 5.53, "opm": 17.25, "gpm": 29.58, "sga": 12.33, "cogsRatio": 70.42, "debtRatio": 62.21, "equityRatio": 61.65, "intCov": 5.5, "assetTurn": 0.44, "invTurn": 2.79, "arTurn": 8.88, "capex": 43483939012.0, "capexRatio": 17.28, "fcf": 32199963579.0, "fcfMargin": 12.8, "ocf": 75683902591.0, "dividend": 3904080400.0, "fixedAssetRatio": 61.77}, {"code": "00660750", "ticker": "205470", "name": "하나머티리얼즈", "year": 2025, "revenue": 273481969679.0, "opinc": 50081056398.0, "ni": 38375641020.0, "roe": 8.28, "roa": 5.6, "opm": 18.31, "gpm": 31.11, "sga": 12.8, "cogsRatio": 68.89, "debtRatio": 47.86, "equityRatio": 67.63, "intCov": 14.18, "assetTurn": 0.4, "invTurn": 2.96, "arTurn": 8.29, "capex": 20320689502.0, "capexRatio": 7.43, "fcf": 48222363017.0, "fcfMargin": 17.63, "ocf": 68543052519.0, "dividend": 4870055750.0, "fixedAssetRatio": 51.98}, {"code": "00161383", "ticker": "042700", "name": "한미반도체", "year": 2023, "revenue": 159008528366.0, "opinc": 34571410992.0, "ni": 267167515858.0, "roe": 46.72, "roa": 36.91, "opm": 21.74, "gpm": 49.94, "sga": 18.22, "cogsRatio": 50.06, "debtRatio": 26.57, "equityRatio": 79.01, "intCov": 3.4, "assetTurn": 0.22, "invTurn": 0.83, "arTurn": 3.91, "capex": 27615344962.0, "capexRatio": 17.37, "fcf": 17375462476.0, "fcfMargin": 10.93, "ocf": 44990807438.0, "dividend": 19467860400.0, "fixedAssetRatio": 18.1}, {"code": "00161383", "ticker": "042700", "name": "한미반도체", "year": 2024, "revenue": 558917191547.0, "opinc": 255391604854.0, "ni": 152614498001.0, "roe": 28.22, "roa": 21.47, "opm": 45.69, "gpm": 56.27, "sga": 7.38, "cogsRatio": 43.73, "debtRatio": 31.43, "equityRatio": 76.09, "intCov": 42.02, "assetTurn": 0.79, "invTurn": 1.59, "arTurn": 3.81, "capex": 53786978690.0, "capexRatio": 9.62, "fcf": 87576840890.0, "fcfMargin": 15.67, "ocf": 141363819580.0, "dividend": 40521474840.0, "fixedAssetRatio": 25.23}, {"code": "00161383", "ticker": "042700", "name": "한미반도체", "year": 2025, "revenue": 576684619527.0, "opinc": 251390142142.0, "ni": 214007548411.0, "roe": 31.0, "roa": 26.31, "opm": 43.59, "gpm": 57.58, "sga": 10.63, "cogsRatio": 42.42, "debtRatio": 17.82, "equityRatio": 84.88, "intCov": 24.39, "assetTurn": 0.71, "invTurn": 1.63, "arTurn": 9.25, "capex": 93735028436.0, "capexRatio": 16.25, "fcf": 134891731344.0, "fcfMargin": 23.39, "ocf": 228626759780.0, "dividend": 68294161440.0, "fixedAssetRatio": 32.15}];
+
+const THEME_META = { good:'양호', warn:'주의', bad:'위험' };
+
+function fmtWon(v) {
+  if (v == null || isNaN(v)) return '—';
+  const av = Math.abs(v);
+  if (av >= 1e12) return (v/1e12).toFixed(1) + '조';
+  if (av >= 1e8) return (v/1e8).toFixed(0) + '억';
+  return v.toLocaleString('ko-KR');
+}
+function fmtPct(v, d=1) { if (v == null || isNaN(v)) return '—'; return v.toFixed(d) + '%'; }
+function fmtX(v) {
+  if (v == null || isNaN(v)) return '—';
+  if (v > 999) return '999+배';
+  if (v < -999) return '−999+배';
+  return v.toFixed(1) + '배';
+}
+
+function badgeOpm(v) {
+  if (v == null || isNaN(v)) return 'na';
+  if (v < 0) return 'bad';
+  if (v < 15) return 'warn';
+  return 'good';
+}
+function badgeRoe(v) {
+  if (v == null || isNaN(v)) return 'na';
+  if (v < 0) return 'bad';
+  if (v < 10) return 'warn';
+  return 'good';
+}
+function badgeDebt(v) {
+  if (v == null || isNaN(v)) return 'na';
+  if (v > 150) return 'bad';
+  return 'good';
+}
+function badgeFcf(v) {
+  if (v == null || isNaN(v)) return 'na';
+  if (v < 0) return 'bad';
+  if (v < 5) return 'warn';
+  return 'good';
+}
+
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+// ---------- state ----------
+let state = { year: 2025, sortKey: 'revenue', sortDir: 'desc', search: '', selected: null };
+
+const byName = {};
+DATA.forEach(r => { (byName[r.name] = byName[r.name] || []).push(r); });
+Object.values(byName).forEach(arr => arr.sort((a,b) => a.year - b.year));
+
+function rowsForYear(year) {
+  return DATA.filter(r => r.year === year);
+}
+
+// ---------- KPI strip ----------
+function renderKPIs() {
+  const rows = rowsForYear(state.year);
+  const profitable = rows.filter(r => r.opinc > 0).length;
+  const fcfPos = rows.filter(r => r.fcf > 0).length;
+  const opmVals = rows.map(r => r.opm).filter(v => v != null && !isNaN(v)).sort((a,b)=>a-b);
+  const medianOpm = opmVals.length ? opmVals[Math.floor(opmVals.length/2)] : null;
+  const totalRevenue = rows.reduce((s,r) => s + (r.revenue||0), 0);
+
+  const kpis = [
+    { label: '분석 대상', value: '35', unit: '개사', note: '2023–2025 · 3개년' },
+    { label: state.year + '년 흑자기업', value: profitable, unit: '/ 35', note: '영업이익 > 0 기준' },
+    { label: state.year + '년 영업이익률 중앙값', value: medianOpm != null ? medianOpm.toFixed(1) : '—', unit: '%', note: '반도체 정상 구간 15~30%' },
+    { label: state.year + '년 합산 매출액', value: fmtWon(totalRevenue), unit: '', note: 'FCF 흑자 ' + fcfPos + '/35개사' },
+  ];
+  document.getElementById('kpiStrip').innerHTML = kpis.map(k => `
+    <div class="kpi">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}<span class="unit">${k.unit}</span></div>
+      <div class="kpi-note">${k.note}</div>
+    </div>`).join('');
+}
+
+// ---------- sparkline / mini line chart ----------
+function drawSpark(canvas, values, opts={}) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = opts.w || 72, h = opts.h || 26;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,w,h);
+  const valid = values.filter(v => v != null && !isNaN(v));
+  if (valid.length < 2) { return; }
+  const min = Math.min(...valid), max = Math.max(...valid);
+  const range = (max - min) || 1;
+  const pad = 4;
+  const step = (w - pad*2) / (values.length - 1);
+  const pts = values.map((v, i) => {
+    if (v == null || isNaN(v)) return null;
+    const x = pad + i * step;
+    const y = h - pad - ((v - min) / range) * (h - pad*2);
+    return [x, y];
+  });
+  const rising = valid[valid.length-1] >= valid[0];
+  const lineColor = rising ? cssVar('--good') : cssVar('--bad');
+
+  ctx.beginPath();
+  let started = false;
+  pts.forEach(p => { if (!p) return; if (!started) { ctx.moveTo(p[0],p[1]); started = true; } else ctx.lineTo(p[0],p[1]); });
+  ctx.strokeStyle = lineColor; ctx.lineWidth = 1.6; ctx.lineJoin='round'; ctx.stroke();
+
+  const last = pts[pts.length-1];
+  if (last) { ctx.beginPath(); ctx.arc(last[0], last[1], 2.2, 0, Math.PI*2); ctx.fillStyle = lineColor; ctx.fill(); }
+}
+
+function drawMiniChart(canvas, values, years, unitFmt) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width || 200, h = 54;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,w,h);
+
+  const valid = values.filter(v => v != null && !isNaN(v));
+  if (valid.length < 2) {
+    ctx.fillStyle = cssVar('--text-faint'); ctx.font = '11px var(--mono)'; ctx.fillText('데이터 부족', 4, h/2);
+    return;
+  }
+  const min = Math.min(...valid), max = Math.max(...valid);
+  const range = (max - min) || Math.abs(max || 1);
+  const padX = 6, padY = 10;
+  const step = (w - padX*2) / (values.length - 1);
+  const border = cssVar('--border');
+  ctx.strokeStyle = border; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, h-padY+0.5); ctx.lineTo(w, h-padY+0.5); ctx.stroke();
+
+  const pts = values.map((v,i) => {
+    if (v == null || isNaN(v)) return null;
+    const x = padX + i*step;
+    const y = h - padY - ((v - min) / range) * (h - padY*2);
+    return [x,y];
+  });
+  const rising = valid[valid.length-1] >= valid[0];
+  const color = rising ? cssVar('--good') : cssVar('--bad');
+
+  // area fill
+  ctx.beginPath();
+  let started = false;
+  pts.forEach(p => { if (!p) return; if (!started) { ctx.moveTo(p[0], h-padY); ctx.lineTo(p[0],p[1]); started = true; } else ctx.lineTo(p[0],p[1]); });
+  const lastPt = pts.filter(p=>p).slice(-1)[0];
+  if (lastPt) ctx.lineTo(lastPt[0], h-padY);
+  ctx.closePath();
+  ctx.fillStyle = color.trim() + '22';
+  ctx.fill();
+
+  ctx.beginPath(); started = false;
+  pts.forEach(p => { if (!p) return; if (!started) { ctx.moveTo(p[0],p[1]); started = true; } else ctx.lineTo(p[0],p[1]); });
+  ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.lineJoin = 'round'; ctx.stroke();
+
+  pts.forEach((p,i) => {
+    if (!p) return;
+    ctx.beginPath(); ctx.arc(p[0], p[1], i === pts.length-1 ? 2.6 : 1.8, 0, Math.PI*2);
+    ctx.fillStyle = i === pts.length-1 ? color : cssVar('--text-faint');
+    ctx.fill();
+  });
+
+  ctx.fillStyle = cssVar('--text-faint');
+  ctx.font = '9.5px var(--mono)';
+  years.forEach((y,i) => { const p = pts[i]; if (p) ctx.fillText(String(y).slice(2), p[0]-6, h); });
+}
+
+// ---------- table ----------
+function renderTable() {
+  let rows = rowsForYear(state.year);
+  if (state.search.trim()) {
+    const q = state.search.trim().toLowerCase();
+    rows = rows.filter(r => r.name.toLowerCase().includes(q));
+  }
+  const key = state.sortKey;
+  rows = rows.slice().sort((a,b) => {
+    const av = a[key], bv = b[key];
+    if (av == null || isNaN(av)) return 1;
+    if (bv == null || isNaN(bv)) return -1;
+    return state.sortDir === 'asc' ? av - bv : bv - av;
+  });
+
+  document.getElementById('yearLabel').textContent = state.year;
+  document.getElementById('rowCount').textContent = rows.length + '개사';
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = rows.map(r => `
+    <tr data-name="${r.name}" class="${state.selected === r.name ? 'selected' : ''}">
+      <td><span class="co-name">${r.name}</span><span class="co-ticker">${r.ticker}</span></td>
+      <td>${fmtWon(r.revenue)}</td>
+      <td><span class="badge ${badgeOpm(r.opm)}">${fmtPct(r.opm)}</span></td>
+      <td><span class="badge ${badgeRoe(r.roe)}">${fmtPct(r.roe)}</span></td>
+      <td><span class="badge ${badgeDebt(r.debtRatio)}">${fmtPct(r.debtRatio,0)}</span></td>
+      <td>${fmtPct(r.capexRatio)}</td>
+      <td><span class="badge ${badgeFcf(r.fcfMargin)}">${fmtPct(r.fcfMargin)}</span></td>
+      <td>${fmtPct(r.fixedAssetRatio)}</td>
+      <td class="spark-cell"><canvas data-spark="${r.name}"></canvas></td>
+    </tr>`).join('');
+
+  tbody.querySelectorAll('tr').forEach(tr => {
+    tr.addEventListener('click', () => { state.selected = tr.dataset.name; renderTable(); renderDetail(tr.dataset.name); });
+  });
+  tbody.querySelectorAll('canvas[data-spark]').forEach(c => {
+    const series = byName[c.dataset.spark].map(r => r.opm);
+    drawSpark(c, series);
+  });
+
+  document.querySelectorAll('#dataTable th').forEach(th => {
+    th.classList.toggle('sorted', th.dataset.key === state.sortKey);
+    th.innerHTML = th.textContent.replace(/\s*[▲▼]$/,'') + (th.dataset.key === state.sortKey ? (state.sortDir==='asc' ? ' <span class="arrow">▲</span>' : ' <span class="arrow">▼</span>') : '');
+  });
+}
+
+// ---------- detail panel ----------
+function renderDetail(name) {
+  const series = byName[name];
+  if (!series) {
+    document.getElementById('detailBody').innerHTML = '<div class="empty-hint">왼쪽 표에서 기업을 선택하면<br/>3개년 추이와 세부 지표를 볼 수 있습니다.</div>';
+    return;
+  }
+  const cur = series.find(r => r.year === state.year) || series[series.length-1];
+  const years = series.map(r => r.year);
+
+  const el = document.getElementById('detailBody');
+  el.innerHTML = `
+    <div><span class="detail-name">${cur.name}</span><span class="detail-ticker">${cur.ticker}</span></div>
+    <div class="mini-charts">
+      <div class="mini-chart"><div class="mc-label"><span>매출액</span><b>${fmtWon(cur.revenue)}</b></div><canvas data-mc="revenue"></canvas></div>
+      <div class="mini-chart"><div class="mc-label"><span>영업이익률</span><b>${fmtPct(cur.opm)}</b></div><canvas data-mc="opm"></canvas></div>
+      <div class="mini-chart"><div class="mc-label"><span>ROE</span><b>${fmtPct(cur.roe)}</b></div><canvas data-mc="roe"></canvas></div>
+      <div class="mini-chart"><div class="mc-label"><span>FCF마진</span><b>${fmtPct(cur.fcfMargin)} <span class="mc-amount">(${fmtWon(cur.fcf)})</span></b></div><canvas data-mc="fcfMargin"></canvas></div>
+    </div>
+    <div class="metric-grid">
+      <div class="metric-row"><span class="m-label">매출총이익률</span><span class="m-value">${fmtPct(cur.gpm)}</span></div>
+      <div class="metric-row"><span class="m-label">매출원가율</span><span class="m-value">${fmtPct(cur.cogsRatio)}</span></div>
+      <div class="metric-row"><span class="m-label">SGA비율</span><span class="m-value">${fmtPct(cur.sga)}</span></div>
+      <div class="metric-row"><span class="m-label">ROA</span><span class="m-value">${fmtPct(cur.roa)}</span></div>
+      <div class="metric-row"><span class="m-label">자기자본비율</span><span class="m-value">${fmtPct(cur.equityRatio)}</span></div>
+      <div class="metric-row"><span class="m-label">부채비율</span><span class="m-value">${fmtPct(cur.debtRatio,0)}</span></div>
+      <div class="metric-row"><span class="m-label">고정자산비율</span><span class="m-value">${fmtPct(cur.fixedAssetRatio)}</span></div>
+      <div class="metric-row"><span class="m-label">이자보상배수</span><span class="m-value">${fmtX(cur.intCov)}</span></div>
+      <div class="metric-row"><span class="m-label">자산회전율</span><span class="m-value">${fmtX(cur.assetTurn)}</span></div>
+      <div class="metric-row"><span class="m-label">재고회전율</span><span class="m-value">${fmtX(cur.invTurn)}</span></div>
+      <div class="metric-row"><span class="m-label">매출채권회전율</span><span class="m-value">${fmtX(cur.arTurn)}</span></div>
+      <div class="metric-row"><span class="m-label">Capex</span><span class="m-value">${fmtWon(cur.capex)}</span></div>
+      <div class="metric-row"><span class="m-label">배당금지급</span><span class="m-value">${fmtWon(cur.dividend)}</span></div>
+    </div>
+  `;
+  el.querySelectorAll('canvas[data-mc]').forEach(c => {
+    const field = c.dataset.mc;
+    drawMiniChart(c, series.map(r => r[field]), years, field);
+  });
+}
+
+// ---------- events ----------
+document.getElementById('yearToggle').addEventListener('click', e => {
+  const btn = e.target.closest('button'); if (!btn) return;
+  state.year = parseInt(btn.dataset.year, 10);
+  document.querySelectorAll('#yearToggle button').forEach(b => b.classList.toggle('active', b === btn));
+  renderKPIs(); renderTable();
+  if (state.selected) renderDetail(state.selected);
+});
+document.getElementById('searchBox').addEventListener('input', e => { state.search = e.target.value; renderTable(); });
+document.querySelectorAll('#dataTable th').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.key;
+    if (state.sortKey === k) state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+    else { state.sortKey = k; state.sortDir = 'desc'; }
+    renderTable();
+  });
+});
+window.addEventListener('resize', () => { if (state.selected) renderDetail(state.selected); });
+
+renderKPIs();
+renderTable();
+renderDetail('삼성전자');
+state.selected = '삼성전자';
+renderTable();
+</script>
